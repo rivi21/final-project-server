@@ -18,18 +18,12 @@ class Invoice
     private $id;
 
     /**
-     * @ORM\OneToOne(targetEntity=Order::class, inversedBy="invoice", cascade={"persist", "remove"})
-     * @ORM\JoinColumn(nullable=false)
-     */
-    private $order_id;
-
-    /**
      * @ORM\Column(type="string", length=255)
      */
-    private $payment_term;
+    private $payment_terms;
 
     /**
-     * @ORM\Column(type="float")
+     * @ORM\Column(type="integer")
      */
     private $total_price;
 
@@ -38,41 +32,36 @@ class Invoice
      */
     private $due_date;
 
+    /**
+     * @ORM\OneToOne(targetEntity=Order::class, inversedBy="invoice", cascade={"persist", "remove"})
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $related_order;
+
+
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getOrderId(): ?Order
+    public function getPaymentTerms(): ?string
     {
-        return $this->order_id;
+        return $this->payment_terms;
     }
 
-    public function setOrderId(Order $order_id): self
+    public function setPaymentTerms(string $payment_terms): self
     {
-        $this->order_id = $order_id;
+        $this->payment_terms = $payment_terms;
 
         return $this;
     }
 
-    public function getPaymentTerm(): ?string
-    {
-        return $this->payment_term;
-    }
-
-    public function setPaymentTerm(string $payment_term): self
-    {
-        $this->payment_term = $payment_term;
-
-        return $this;
-    }
-
-    public function getTotalPrice(): ?float
+    public function getTotalPrice(): ?int
     {
         return $this->total_price;
     }
 
-    public function setTotalPrice(float $total_price): self
+    public function setTotalPrice(int $total_price): self
     {
         $this->total_price = $total_price;
 
@@ -90,4 +79,18 @@ class Invoice
 
         return $this;
     }
+
+    public function getRelatedOrder(): ?Order
+    {
+        return $this->related_order;
+    }
+
+    public function setRelatedOrder(Order $related_order): self
+    {
+        $this->related_order = $related_order;
+
+        return $this;
+    }
+
+    
 }

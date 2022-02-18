@@ -20,12 +20,6 @@ class Customer
     private $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Agent::class, inversedBy="customers")
-     * @ORM\JoinColumn(nullable=false)
-     */
-    private $agent_id;
-
-    /**
      * @ORM\Column(type="string", length=255)
      */
     private $name;
@@ -56,12 +50,18 @@ class Customer
     private $web;
 
     /**
-     * @ORM\OneToMany(targetEntity=ShoppingCartItem::class, mappedBy="customer_id")
+     * @ORM\ManyToOne(targetEntity=Agent::class, inversedBy="customers")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $agent;
+
+    /**
+     * @ORM\OneToMany(targetEntity=ShoppingCartItem::class, mappedBy="customer")
      */
     private $shoppingCartItems;
 
     /**
-     * @ORM\OneToMany(targetEntity=Order::class, mappedBy="customer_id")
+     * @ORM\OneToMany(targetEntity=Order::class, mappedBy="customer")
      */
     private $orders;
 
@@ -74,18 +74,6 @@ class Customer
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getAgentId(): ?Agent
-    {
-        return $this->agent_id;
-    }
-
-    public function setAgentId(?Agent $agent_id): self
-    {
-        $this->agent_id = $agent_id;
-
-        return $this;
     }
 
     public function getName(): ?string
@@ -160,6 +148,18 @@ class Customer
         return $this;
     }
 
+    public function getAgent(): ?Agent
+    {
+        return $this->agent;
+    }
+
+    public function setAgent(?Agent $agent): self
+    {
+        $this->agent = $agent;
+
+        return $this;
+    }
+
     /**
      * @return Collection<int, ShoppingCartItem>
      */
@@ -172,7 +172,7 @@ class Customer
     {
         if (!$this->shoppingCartItems->contains($shoppingCartItem)) {
             $this->shoppingCartItems[] = $shoppingCartItem;
-            $shoppingCartItem->setCustomerId($this);
+            $shoppingCartItem->setCustomer($this);
         }
 
         return $this;
@@ -182,8 +182,8 @@ class Customer
     {
         if ($this->shoppingCartItems->removeElement($shoppingCartItem)) {
             // set the owning side to null (unless already changed)
-            if ($shoppingCartItem->getCustomerId() === $this) {
-                $shoppingCartItem->setCustomerId(null);
+            if ($shoppingCartItem->getCustomer() === $this) {
+                $shoppingCartItem->setCustomer(null);
             }
         }
 
@@ -202,7 +202,7 @@ class Customer
     {
         if (!$this->orders->contains($order)) {
             $this->orders[] = $order;
-            $order->setCustomerId($this);
+            $order->setCustomer($this);
         }
 
         return $this;
@@ -212,8 +212,8 @@ class Customer
     {
         if ($this->orders->removeElement($order)) {
             // set the owning side to null (unless already changed)
-            if ($order->getCustomerId() === $this) {
-                $order->setCustomerId(null);
+            if ($order->getCustomer() === $this) {
+                $order->setCustomer(null);
             }
         }
 

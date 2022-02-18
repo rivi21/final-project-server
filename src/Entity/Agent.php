@@ -27,12 +27,17 @@ class Agent
     /**
      * @ORM\Column(type="string", length=64)
      */
-    private $lastName;
+    private $last_name;
 
     /**
      * @ORM\Column(type="string", length=255)
      */
     private $address;
+
+    /**
+     * @ORM\Column(type="string", length=64)
+     */
+    private $country;
 
     /**
      * @ORM\Column(type="string", length=64)
@@ -50,7 +55,7 @@ class Agent
     private $password;
 
     /**
-     * @ORM\OneToMany(targetEntity=Customer::class, mappedBy="agent_id")
+     * @ORM\OneToMany(targetEntity=Customer::class, mappedBy="agent")
      */
     private $customers;
 
@@ -78,12 +83,12 @@ class Agent
 
     public function getLastName(): ?string
     {
-        return $this->lastName;
+        return $this->last_name;
     }
 
-    public function setLastName(string $lastName): self
+    public function setLastName(string $last_name): self
     {
-        $this->lastName = $lastName;
+        $this->last_name = $last_name;
 
         return $this;
     }
@@ -96,6 +101,18 @@ class Agent
     public function setAddress(string $address): self
     {
         $this->address = $address;
+
+        return $this;
+    }
+
+    public function getCountry(): ?string
+    {
+        return $this->country;
+    }
+
+    public function setCountry(string $country): self
+    {
+        $this->country = $country;
 
         return $this;
     }
@@ -148,7 +165,7 @@ class Agent
     {
         if (!$this->customers->contains($customer)) {
             $this->customers[] = $customer;
-            $customer->setAgentId($this);
+            $customer->setAgent($this);
         }
 
         return $this;
@@ -158,8 +175,8 @@ class Agent
     {
         if ($this->customers->removeElement($customer)) {
             // set the owning side to null (unless already changed)
-            if ($customer->getAgentId() === $this) {
-                $customer->setAgentId(null);
+            if ($customer->getAgent() === $this) {
+                $customer->setAgent(null);
             }
         }
 

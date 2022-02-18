@@ -20,7 +20,7 @@ class Product
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=128)
+     * @ORM\Column(type="string", length=64)
      */
     private $type;
 
@@ -30,22 +30,22 @@ class Product
     private $model;
 
     /**
-     * @ORM\Column(type="float")
+     * @ORM\Column(type="integer")
      */
     private $price;
 
     /**
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="string", length=255)
      */
     private $stock;
 
     /**
-     * @ORM\OneToMany(targetEntity=ShoppingCartItem::class, mappedBy="product_id")
+     * @ORM\OneToMany(targetEntity=ShoppingCartItem::class, mappedBy="product")
      */
     private $shoppingCartItems;
 
     /**
-     * @ORM\OneToMany(targetEntity=Order::class, mappedBy="product_id")
+     * @ORM\OneToMany(targetEntity=Order::class, mappedBy="product")
      */
     private $orders;
 
@@ -84,24 +84,24 @@ class Product
         return $this;
     }
 
-    public function getPrice(): ?float
+    public function getPrice(): ?int
     {
         return $this->price;
     }
 
-    public function setPrice(float $price): self
+    public function setPrice(int $price): self
     {
         $this->price = $price;
 
         return $this;
     }
 
-    public function getStock(): ?int
+    public function getStock(): ?string
     {
         return $this->stock;
     }
 
-    public function setStock(int $stock): self
+    public function setStock(string $stock): self
     {
         $this->stock = $stock;
 
@@ -120,7 +120,7 @@ class Product
     {
         if (!$this->shoppingCartItems->contains($shoppingCartItem)) {
             $this->shoppingCartItems[] = $shoppingCartItem;
-            $shoppingCartItem->setProductId($this);
+            $shoppingCartItem->setProduct($this);
         }
 
         return $this;
@@ -130,8 +130,8 @@ class Product
     {
         if ($this->shoppingCartItems->removeElement($shoppingCartItem)) {
             // set the owning side to null (unless already changed)
-            if ($shoppingCartItem->getProductId() === $this) {
-                $shoppingCartItem->setProductId(null);
+            if ($shoppingCartItem->getProduct() === $this) {
+                $shoppingCartItem->setProduct(null);
             }
         }
 
@@ -150,7 +150,7 @@ class Product
     {
         if (!$this->orders->contains($order)) {
             $this->orders[] = $order;
-            $order->setProductId($this);
+            $order->setProduct($this);
         }
 
         return $this;
@@ -160,8 +160,8 @@ class Product
     {
         if ($this->orders->removeElement($order)) {
             // set the owning side to null (unless already changed)
-            if ($order->getProductId() === $this) {
-                $order->setProductId(null);
+            if ($order->getProduct() === $this) {
+                $order->setProduct(null);
             }
         }
 

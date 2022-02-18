@@ -18,12 +18,6 @@ class Delivery
     private $id;
 
     /**
-     * @ORM\OneToOne(targetEntity=Order::class, inversedBy="delivery", cascade={"persist", "remove"})
-     * @ORM\JoinColumn(nullable=false)
-     */
-    private $order_id;
-
-    /**
      * @ORM\Column(type="date")
      */
     private $shipping_date;
@@ -36,23 +30,17 @@ class Delivery
     /**
      * @ORM\Column(type="string", length=255)
      */
-    private $shipping_coditions;
+    private $shipping_conditions;
+
+    /**
+     * @ORM\OneToOne(targetEntity=Order::class, inversedBy="delivery", cascade={"persist", "remove"})
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $related_order;
 
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getOrderId(): ?Order
-    {
-        return $this->order_id;
-    }
-
-    public function setOrderId(Order $order_id): self
-    {
-        $this->order_id = $order_id;
-
-        return $this;
     }
 
     public function getShippingDate(): ?\DateTimeInterface
@@ -79,14 +67,26 @@ class Delivery
         return $this;
     }
 
-    public function getShippingCoditions(): ?string
+    public function getShippingConditions(): ?string
     {
-        return $this->shipping_coditions;
+        return $this->shipping_conditions;
     }
 
-    public function setShippingCoditions(string $shipping_coditions): self
+    public function setShippingConditions(string $shipping_conditions): self
     {
-        $this->shipping_coditions = $shipping_coditions;
+        $this->shipping_conditions = $shipping_conditions;
+
+        return $this;
+    }
+
+    public function getRelatedOrder(): ?Order
+    {
+        return $this->related_order;
+    }
+
+    public function setRelatedOrder(Order $related_order): self
+    {
+        $this->related_order = $related_order;
 
         return $this;
     }
