@@ -49,11 +49,7 @@ class Customer
      */
     private $web;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=Agent::class, inversedBy="customers")
-     * @ORM\JoinColumn(nullable=false)
-     */
-    private $agent;
+
 
     /**
      * @ORM\OneToMany(targetEntity=ShoppingCartItem::class, mappedBy="customer")
@@ -64,6 +60,12 @@ class Customer
      * @ORM\OneToMany(targetEntity=Order::class, mappedBy="customer")
      */
     private $orders;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Agent::class, inversedBy="customers")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $agent;
 
     public function __construct()
     {

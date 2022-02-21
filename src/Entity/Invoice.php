@@ -38,6 +38,20 @@ class Invoice
      */
     private $related_order;
 
+    /**
+     * @ORM\Column(type="string", length=10)
+     */
+    private $sales_comission;
+
+    /**
+     * @ORM\Column(type="string", length=20)
+     */
+    private $comission_amount;
+
+    public function __toString()
+    {
+        return $this->due_date;
+    }
 
     public function getId(): ?int
     {
@@ -88,6 +102,30 @@ class Invoice
     public function setRelatedOrder(Order $related_order): self
     {
         $this->related_order = $related_order;
+
+        return $this;
+    }
+
+    public function getSalesComission(): ?string
+    {
+        return $this->sales_comission;
+    }
+
+    public function setSalesComission(string $sales_comission): self
+    {
+        $this->sales_comission = $sales_comission;
+
+        return $this;
+    }
+
+    public function getComissionAmount(): ?string
+    {
+        return $this->comission_amount;
+    }
+
+    public function setComissionAmount(string $comission_amount): self
+    {
+        $this->comission_amount = $comission_amount;
 
         return $this;
     }

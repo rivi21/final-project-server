@@ -19,6 +19,15 @@ class InvoiceRepository extends ServiceEntityRepository
         parent::__construct($registry, Invoice::class);
     }
 
+   /*  public function findOneBySomeField()
+    {
+        $qb = $this->createQueryBuilder('i')
+            ->where('i.')
+        return $qb->getQuery()->execute();
+    } */
+
+
+
     // /**
     //  * @return Invoice[] Returns an array of Invoice objects
     //  */

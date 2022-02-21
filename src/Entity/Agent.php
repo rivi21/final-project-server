@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\AgentRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -59,6 +61,16 @@ class Agent implements UserInterface, PasswordAuthenticatedUserInterface
      * @ORM\Column(type="string", length=128)
      */
     private $phone_number;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Customer::class, mappedBy="agent")
+     */
+    private $customers;
+
+    public function __construct()
+    {
+        $this->customers = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -205,6 +217,36 @@ class Agent implements UserInterface, PasswordAuthenticatedUserInterface
     public function setPhoneNumber(string $phone_number): self
     {
         $this->phone_number = $phone_number;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Customer>
+     */
+    public function getCustomers(): Collection
+    {
+        return $this->customers;
+    }
+
+    public function addCustomer(Customer $customer): self
+    {
+        if (!$this->customers->contains($customer)) {
+            $this->customers[] = $customer;
+            $customer->setAgent($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCustomer(Customer $customer): self
+    {
+        if ($this->customers->removeElement($customer)) {
+            // set the owning side to null (unless already changed)
+            if ($customer->getAgent() === $this) {
+                $customer->setAgent(null);
+            }
+        }
 
         return $this;
     }
