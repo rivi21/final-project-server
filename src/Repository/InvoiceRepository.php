@@ -2,8 +2,10 @@
 
 namespace App\Repository;
 
+use App\Entity\Customer;
 use App\Entity\Invoice;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\EntityManager;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -18,6 +20,33 @@ class InvoiceRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Invoice::class);
     }
+
+    // LISTADO DE FACTURAS PARA UN CLIENTE
+ 
+    public function findByCustomer(Customer $customer)
+    {
+        $qb = $this->createQueryBuilder('i')
+            ->select('i, o') 
+            ->join('i.related_order', 'o')
+            ->where('o.customer = :customer')
+            ->orderBy('i.due_date', 'DESC')
+            ->setParameter('customer', $customer)   
+        ;
+        return $qb->getQuery()->execute();
+    }
+   
+    //LISTADO DE FACTURAS TOtales
+    public function findByCustomers($customers)
+    {
+        $qb = $this->createQueryBuilder('i')
+            ->select('i, o') 
+            ->join('i.related_order', 'o')
+            ->where('o.customer in (:customers)')
+            ->setParameter('customers', $customers)
+        ;
+        return $qb->getQuery()->execute();
+    }
+
 
    /*  public function findOneBySomeField()
     {

@@ -50,7 +50,7 @@ class Invoice
 
     public function __toString()
     {
-        return $this->due_date;
+        return $this->payment_terms;
     }
 
     public function getId(): ?int

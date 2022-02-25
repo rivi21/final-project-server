@@ -49,8 +49,6 @@ class Customer
      */
     private $web;
 
-
-
     /**
      * @ORM\OneToMany(targetEntity=ShoppingCartItem::class, mappedBy="customer")
      */

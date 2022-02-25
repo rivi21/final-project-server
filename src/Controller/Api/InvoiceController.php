@@ -15,16 +15,19 @@ use Symfony\Component\Routing\Annotation\Route;
 
 
 class InvoiceController extends AbstractController
-{   
-     /**
+{
+    /**
      * @Route("/api/invoice", name="api_invoice", methods={"OPTIONS"})
      */
     public function options(): Response
     {
-        return new Response ('', 200, [
-            'Access-Control-Allow-Origin'=> 'http://localhost:3000',
-            'Access-Control-Allow-Credentials' => 'true',
-            'Access-Control-Allow-Headers' =>'Authorization, Content-Type'
+        return new Response(
+            '',
+            200,
+            [
+                'Access-Control-Allow-Origin' => 'http://localhost:3000',
+                'Access-Control-Allow-Credentials' => 'true',
+                'Access-Control-Allow-Headers' => 'Authorization, Content-Type'
             ]
         );
     }
@@ -41,7 +44,7 @@ class InvoiceController extends AbstractController
                 'id' => $invoice->getId(),
                 'paymentTerms' => $invoice->getPaymentTerms(),
                 'totalPrice' => $invoice->getTotalPrice(),
-                'dueDate' => $invoice->getDueDate(),
+                'dueDate' => $invoice->getDueDate()->format('d-m-Y'),
             ];
         }
         return new JsonResponse($response, 200, [
@@ -52,7 +55,7 @@ class InvoiceController extends AbstractController
     /**
      * @Route("/api/comission", methods={"GET"})
      */
-    public function showComissions( InvoiceRepository $invoiceRepository, OrderRepository $orderRepository): Response
+    public function showComissions(InvoiceRepository $invoiceRepository, OrderRepository $orderRepository): Response
     {
         /* $order = $orderRepository->findOneBy(['id' => $content['order']]); */
 
@@ -84,7 +87,7 @@ class InvoiceController extends AbstractController
         $invoice->setRelatedOrder($order);
         $invoice->setPaymentTerms($content['paymentTerms']);
         $invoice->setTotalPrice($content['totalPrice']);
-        $invoice->setDueDate(\DateTime::createFromFormat('d-m-Y', $content['dueDate']));
+        $invoice->setDueDate($content['dueDate']);
 
         $invoice->setSalesComission($content['salesComission']);
         $invoice->setComissionAmount($content['comissionAmount']);
@@ -97,6 +100,57 @@ class InvoiceController extends AbstractController
             'content' => $invoice
         ]);
     }
+    // LISTADO DE FACTURAS PARA UN CLIENTE
+    /**
+     * @Route("/dueBalance/{idCustomer}",  methods={"GET"})
+     */
+    public function dueBalance($idCustomer, InvoiceRepository $ir, CustomerRepository $cr): Response
+    {
+        //consulta para obtener el customer
+        $customer = $cr->find($idCustomer);
+        // consulta para obtener las invoices de ese customer
+        $invoices = $ir->findByCustomer($customer);
+        $response = [];
+        foreach ($invoices as $invoice) {
+            $response[] = [
+                'id' => $invoice->getId(),
+                'name' => $customer->getName(),
+                'due_date' => $invoice->getDueDate()->format('d-m-Y'),
+                'totalPrice' => $invoice->getTotalPrice(),
+            ];
+        }
+        return new JsonResponse($response, 200, [
+            'Access-Control-Allow-Origin' => '*'
+        ]);
+    }
+
+    //LISTADO DE PEDIDOS POR CLIENTES
+    /**
+     * @Route("/totalBalance",  methods={"GET"})
+     */
+    public function totalBalance(InvoiceRepository $ir, CustomerRepository $cr): Response
+    {
+
+        $customers = $cr->findAll();   
+        $invoices = $ir->findByCustomers($customers);
+       
+      /*   for ($i = 0; $i < sizeof($customers); $i++){          
+            foreach ($invoices as $invoice) {
+                $response[] = [
+                    'id' => $invoice->getId(),               
+                    'due_date' => $invoice->getDueDate()->format('d-m-Y'),
+                    'totalPrice' => $invoice->getTotalPrice(),
+                    'name'=> $invoice->getRelatedOrder()
+                ];               
+            }            
+        } */
+       
+        return new JsonResponse([
+            'content' => $invoices
+        ]);
+    }
+
+
     /**
      * @Route("/api/invoice/{id}", methods={"PUT"})
      */

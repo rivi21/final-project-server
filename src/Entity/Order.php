@@ -24,6 +24,41 @@ class Order
     private $date;
 
     /**
+     * @ORM\Column(type="string", length=20)
+     */
+    private $total_price;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $payment_terms;
+
+    /**
+     * @ORM\Column(type="date")
+     */
+    private $shipping_date;
+
+    /**
+     * @ORM\Column(type="date")
+     */
+    private $delivery_date;
+
+    /**
+    * @ORM\Column(type="date")
+    */
+    private $due_date;
+
+    /**
+     * @ORM\Column(type="string", length=10)
+     */
+    private $sales_comission;
+
+    /**
+     * @ORM\Column(type="string", length=20)
+     */
+    private $comission_amount;
+
+     /**
      * @ORM\ManyToOne(targetEntity=Customer::class, inversedBy="orders")
      * @ORM\JoinColumn(nullable=false)
      */
@@ -35,15 +70,10 @@ class Order
      */
     private $product;
 
-    /**
-     * @ORM\OneToOne(targetEntity=Delivery::class, mappedBy="related_order", cascade={"persist", "remove"})
-     */
-    private $delivery;
-
-    /**
-     * @ORM\OneToOne(targetEntity=Invoice::class, mappedBy="related_order", cascade={"persist", "remove"})
-     */
-    private $invoice;
+    public function __toString()
+    {
+        return $this->payment_terms;
+    }
 
     public function getId(): ?int
     {
@@ -86,36 +116,86 @@ class Order
         return $this;
     }
 
-    public function getDelivery(): ?Delivery
+    public function getTotalPrice(): ?string
     {
-        return $this->delivery;
+        return $this->total_price;
     }
 
-    public function setDelivery(Delivery $delivery): self
+    public function setTotalPrice(string $total_price): self
     {
-        // set the owning side of the relation if necessary
-        if ($delivery->getRelatedOrder() !== $this) {
-            $delivery->setRelatedOrder($this);
-        }
-
-        $this->delivery = $delivery;
+        $this->total_price = $total_price;
 
         return $this;
     }
 
-    public function getInvoice(): ?Invoice
+    public function getPaymentTerms(): ?string
     {
-        return $this->invoice;
+        return $this->payment_terms;
     }
 
-    public function setInvoice(Invoice $invoice): self
+    public function setPaymentTerms(string $payment_terms): self
     {
-        // set the owning side of the relation if necessary
-        if ($invoice->getRelatedOrder() !== $this) {
-            $invoice->setRelatedOrder($this);
-        }
+        $this->payment_terms = $payment_terms;
 
-        $this->invoice = $invoice;
+        return $this;
+    }
+
+    public function getShippingDate(): ?\DateTimeInterface
+    {
+        return $this->shipping_date;
+    }
+
+    public function setShippingDate(\DateTimeInterface $shipping_date): self
+    {
+        $this->shipping_date = $shipping_date;
+
+        return $this;
+    }
+
+    public function getDeliveryDate(): ?\DateTimeInterface
+    {
+        return $this->delivery_date;
+    }
+
+    public function setDeliveryDate(\DateTimeInterface $delivery_date): self
+    {
+        $this->delivery_date = $delivery_date;
+
+        return $this;
+    }
+
+    public function getDueDate(): ?\DateTimeInterface
+    {
+        return $this->due_date;
+    }
+
+    public function setDueDate(\DateTimeInterface $due_date): self
+    {
+        $this->due_date = $due_date;
+
+        return $this;
+    }
+
+    public function getSalesComission(): ?string
+    {
+        return $this->sales_comission;
+    }
+
+    public function setSalesComission(string $sales_comission): self
+    {
+        $this->sales_comission = $sales_comission;
+
+        return $this;
+    }
+
+    public function getComissionAmount(): ?string
+    {
+        return $this->comission_amount;
+    }
+
+    public function setComissionAmount(string $comission_amount): self
+    {
+        $this->comission_amount = $comission_amount;
 
         return $this;
     }
