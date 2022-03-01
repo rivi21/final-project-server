@@ -23,41 +23,6 @@ class Order
      */
     private $date;
 
-    /**
-     * @ORM\Column(type="string", length=20)
-     */
-    private $total_price;
-
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
-    private $payment_terms;
-
-    /**
-     * @ORM\Column(type="date")
-     */
-    private $shipping_date;
-
-    /**
-     * @ORM\Column(type="date")
-     */
-    private $delivery_date;
-
-    /**
-    * @ORM\Column(type="date")
-    */
-    private $due_date;
-
-    /**
-     * @ORM\Column(type="string", length=10)
-     */
-    private $sales_comission;
-
-    /**
-     * @ORM\Column(type="string", length=20)
-     */
-    private $comission_amount;
-
      /**
      * @ORM\ManyToOne(targetEntity=Customer::class, inversedBy="orders")
      * @ORM\JoinColumn(nullable=false)
@@ -70,10 +35,22 @@ class Order
      */
     private $product;
 
-    public function __toString()
-    {
-        return $this->payment_terms;
-    }
+    /**
+     * @ORM\Column(type="date")
+     */
+    private $shippingDate;
+
+    /**
+     * @ORM\Column(type="date")
+     */
+    private $deliveryDate;
+
+    /**
+     * @ORM\OneToOne(targetEntity=Invoices::class, mappedBy="orderRelated", cascade={"persist", "remove"})
+     */
+    private $invoice;
+
+
 
     public function getId(): ?int
     {
@@ -116,7 +93,9 @@ class Order
         return $this;
     }
 
-    public function getTotalPrice(): ?string
+    
+
+    /* public function getTotalPrice(): ?string
     {
         return $this->total_price;
     }
@@ -140,30 +119,7 @@ class Order
         return $this;
     }
 
-    public function getShippingDate(): ?\DateTimeInterface
-    {
-        return $this->shipping_date;
-    }
-
-    public function setShippingDate(\DateTimeInterface $shipping_date): self
-    {
-        $this->shipping_date = $shipping_date;
-
-        return $this;
-    }
-
-    public function getDeliveryDate(): ?\DateTimeInterface
-    {
-        return $this->delivery_date;
-    }
-
-    public function setDeliveryDate(\DateTimeInterface $delivery_date): self
-    {
-        $this->delivery_date = $delivery_date;
-
-        return $this;
-    }
-
+    
     public function getDueDate(): ?\DateTimeInterface
     {
         return $this->due_date;
@@ -198,5 +154,48 @@ class Order
         $this->comission_amount = $comission_amount;
 
         return $this;
+    } */
+
+    public function getShippingDate(): ?\DateTimeInterface
+    {
+        return $this->shippingDate;
     }
+
+    public function setShippingDate(\DateTimeInterface $shippingDate): self
+    {
+        $this->shippingDate = $shippingDate;
+
+        return $this;
+    }
+
+    public function getDeliveryDate(): ?\DateTimeInterface
+    {
+        return $this->deliveryDate;
+    }
+
+    public function setDeliveryDate(\DateTimeInterface $deliveryDate): self
+    {
+        $this->deliveryDate = $deliveryDate;
+
+        return $this;
+    }
+
+    public function getInvoice(): ?Invoices
+    {
+        return $this->invoice;
+    }
+
+    public function setInvoice(Invoices $invoice): self
+    {
+        // set the owning side of the relation if necessary
+        if ($invoice->getOrderRelated() !== $this) {
+            $invoice->setOrderRelated($this);
+        }
+
+        $this->invoice = $invoice;
+
+        return $this;
+    }
+
+   
 }

@@ -1,25 +1,110 @@
 <?php
 
-namespace App\Controller\Api;
+namespace App\Controller;
 
-use App\Entity\Invoice;
-use App\Repository\CustomerRepository;
-use App\Repository\InvoiceRepository;
-use App\Repository\OrderRepository;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-
-class InvoiceController extends AbstractController
+class CopyController extends AbstractController
 {
+    /**
+     * @Route("/copy", name="copy")
+     */
+    public function index(): Response
+    {
+        return $this->render('copy/index.html.twig', [
+            'controller_name' => 'CopyController',
+        ]);
+    }
+    //-------------------------AQUI LO DE ORDER CONTROLLER----------------------
+    /**
+     * @Route("/api/order", name="api_order", methods={"GET"})
+     */
+    /*  public function index(OrderRepository $orderRepository): Response
+    {
+        $orders = $orderRepository->findAll();
+        $response = [];
+        foreach ($orders as $order) {
+            $response[] = [
+                'date' => $order->getDate()->format('d-m-Y')
+            ];
+        }
+        return new JsonResponse($response, 200, [
+            'Access-Control-Allow-Origin' => 'http://localhost:3000'
+        ]);
+    } */
+    /**
+     * @Route("/api/order", methods={"POST"})
+     */
+    /*  public function add(Request $request, EntityManagerInterface $em, CustomerRepository $customerRepository, ProductRepository $productRepository)
+    {
+        $content = json_decode($request->getContent(), true);
+
+        $order = new Order();
+        $customer = $customerRepository->findOneBy(['name' => $content['customer']]);
+        $order->setCustomer($customer);
+        $product = $productRepository->findOneBy(['model' => $content['product']]);
+        $order->setProduct($product);
+        $order->setDate(\DateTime::createFromFormat('d-m-Y', $content['date']));
+
+        $em->persist($order);
+        $em->flush();
+
+        return new JsonResponse([
+            'result' => 'add con POST ok',
+            'content' => $order
+        ]);
+    } */
+    // ------------------------AQUI LO DE DELIVERY CONTROLLER---------------------
+
+    /**
+     * @Route("/api/delivery", name="api_delivery", methods={"GET"})
+     */
+    /* public function delivery(DeliveryRepository $deliveryRepository): Response
+    {
+        $deliverys = $deliveryRepository->findAll();
+        $response = [];
+        foreach ($deliverys as $delivery) {
+            $response[] = [
+                'relatedOrder' => $delivery->getRelatedOrder(),
+                'shippingDate' => $delivery->getShippingDate(),
+                'deliveryDate' => $delivery->getDeliveryDate(),
+                'shippingConditions' => $delivery->getShippingConditions()
+            ];
+        }
+        return new JsonResponse($response, 200, [
+            'Access-Control-Allow-Origin' => 'http://localhost:3000'
+        ]);
+    } */
+    /**
+     * @Route("/api/delivery", methods={"POST"})
+     */
+    /* public function add2(Request $request, EntityManagerInterface $em, OrderRepository $orderRepository)
+    {
+        $content = json_decode($request->getContent(), true);
+
+        $delivery = new Delivery();
+        $order = $orderRepository->findOneBy(['id' => $content['order']]);
+        $delivery->setRelatedOrder($order);
+        $delivery->setShippingDate(\DateTime::createFromFormat('d-m-Y', $content['shippingDate']));
+        $delivery->setDeliveryDate(\DateTime::createFromFormat('d-m-Y', $content['DeliveryDate']));
+        $delivery->setShippingConditions($content['shippingConditions']);
+        $em->persist($delivery);
+        $em->flush();
+
+        return new JsonResponse([
+            'result' => 'add con POST ok',
+            'content' => $delivery
+        ]);
+    } */
+
+
+    // -------------------------AQUÍ LO DE INVOICE CONTROLLER-------------------------
     /**
      * @Route("/api/invoice", name="api_invoice", methods={"OPTIONS"})
      */
-    public function options(): Response
+    /* public function options(): Response
     {
         return new Response(
             '',
@@ -30,12 +115,12 @@ class InvoiceController extends AbstractController
                 'Access-Control-Allow-Headers' => 'Authorization, Content-Type'
             ]
         );
-    }
+    } */
+
     /**
      * @Route("/api/invoice", name="api_invoice", methods={"GET"})
      */
-
-    public function index(InvoiceRepository $invoiceRepository): Response
+    /* public function index(InvoiceRepository $invoiceRepository): Response
     {
         $invoices = $invoiceRepository->findAll();
         $response = [];
@@ -50,15 +135,14 @@ class InvoiceController extends AbstractController
         return new JsonResponse($response, 200, [
             'Access-Control-Allow-Origin' => '*'
         ]);
-    }
+    } */
 
     /**
      * @Route("/api/comission", methods={"GET"})
      */
-    public function showComissions(InvoiceRepository $invoiceRepository, OrderRepository $orderRepository): Response
+    /*  public function showComissions(InvoiceRepository $invoiceRepository, OrderRepository $orderRepository): Response
     {
-        /* $order = $orderRepository->findOneBy(['id' => $content['order']]); */
-
+        
         $invoices = $invoiceRepository->findAll();
         $response = [];
         foreach ($invoices as $invoice) {
@@ -73,12 +157,12 @@ class InvoiceController extends AbstractController
         return new JsonResponse($response, 200, [
             'Access-Control-Allow-Origin' => '*'
         ]);
-    }
+    } */
 
     /**
      * @Route("/api/invoice", methods={"POST"})
      */
-    public function add(Request $request, EntityManagerInterface $em, OrderRepository $orderRepository)
+    /* public function add3(Request $request, EntityManagerInterface $em, OrderRepository $orderRepository)
     {
         $content = json_decode($request->getContent(), true);
 
@@ -99,12 +183,12 @@ class InvoiceController extends AbstractController
             'result' => 'add con POST ok',
             'content' => $invoice
         ]);
-    }
+    } */
     // LISTADO DE FACTURAS PARA UN CLIENTE
     /**
      * @Route("/dueBalance/{idCustomer}",  methods={"GET"})
      */
-    public function dueBalance($idCustomer, InvoiceRepository $ir, CustomerRepository $cr): Response
+    /* public function dueBalance($idCustomer, InvoiceRepository $ir, CustomerRepository $cr): Response
     {
         //consulta para obtener el customer
         $customer = $cr->find($idCustomer);
@@ -122,19 +206,19 @@ class InvoiceController extends AbstractController
         return new JsonResponse($response, 200, [
             'Access-Control-Allow-Origin' => '*'
         ]);
-    }
+    } */
 
     //LISTADO DE PEDIDOS POR CLIENTES
     /**
      * @Route("/totalBalance",  methods={"GET"})
      */
-    public function totalBalance(InvoiceRepository $ir, CustomerRepository $cr): Response
+    /* public function totalBalance(InvoiceRepository $ir, CustomerRepository $cr): Response
     {
 
         $customers = $cr->findAll();   
         $invoices = $ir->findByCustomers($customers);
        
-      /*   for ($i = 0; $i < sizeof($customers); $i++){          
+        for ($i = 0; $i < sizeof($customers); $i++){          
             foreach ($invoices as $invoice) {
                 $response[] = [
                     'id' => $invoice->getId(),               
@@ -143,12 +227,12 @@ class InvoiceController extends AbstractController
                     'name'=> $invoice->getRelatedOrder()
                 ];               
             }            
-        } */
+        }
        
         return new JsonResponse([
-            'content' => $invoices
+            'content' => $response
         ]);
-    }
+    } */
 
 
     /**
@@ -199,4 +283,10 @@ class InvoiceController extends AbstractController
             'result' => 'delete ok',
         ]);
     } */
+
+    public function __toString()
+    {
+        return $this->payment_terms;
+    }
+
 }
