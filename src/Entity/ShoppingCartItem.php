@@ -29,16 +29,16 @@ class ShoppingCartItem
     private $customer;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Product::class, inversedBy="shoppingCartItems")
-     * @ORM\JoinColumn(nullable=false)
-     */
-    private $product;
-
-    /**
      * @ORM\ManyToOne(targetEntity=Order::class, inversedBy="shoppingCartItems")
      * @ORM\JoinColumn(nullable=false)
      */
     private $orderRelated;
+
+    /**
+     * @ORM\OneToOne(targetEntity=Product::class, cascade={"persist", "remove"})
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $product;
 
     public function getId(): ?int
     {
@@ -69,18 +69,6 @@ class ShoppingCartItem
         return $this;
     }
 
-    public function getProduct(): ?Product
-    {
-        return $this->product;
-    }
-
-    public function setProduct(?Product $product): self
-    {
-        $this->product = $product;
-
-        return $this;
-    }
-
     public function getOrderRelated(): ?Order
     {
         return $this->orderRelated;
@@ -89,6 +77,18 @@ class ShoppingCartItem
     public function setOrderRelated(?Order $orderRelated): self
     {
         $this->orderRelated = $orderRelated;
+
+        return $this;
+    }
+
+    public function getProduct(): ?Product
+    {
+        return $this->product;
+    }
+
+    public function setProduct(Product $product): self
+    {
+        $this->product = $product;
 
         return $this;
     }

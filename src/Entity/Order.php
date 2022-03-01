@@ -39,13 +39,7 @@ class Order
      * @ORM\ManyToOne(targetEntity=Customer::class, inversedBy="orders")
      * @ORM\JoinColumn(nullable=false)
      */
-    private $customer;
-
-    /**
-     * @ORM\ManyToOne(targetEntity=Product::class, inversedBy="orders")
-     * @ORM\JoinColumn(nullable=false)
-     */
-    private $product;
+    private $customer;  
 
     /**
      * @ORM\OneToOne(targetEntity=Invoices::class, mappedBy="orderRelated", cascade={"persist", "remove"})
@@ -111,18 +105,6 @@ class Order
     public function setCustomer(?Customer $customer): self
     {
         $this->customer = $customer;
-
-        return $this;
-    }
-
-    public function getProduct(): ?Product
-    {
-        return $this->product;
-    }
-
-    public function setProduct(?Product $product): self
-    {
-        $this->product = $product;
 
         return $this;
     }
