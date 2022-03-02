@@ -51,27 +51,23 @@ class InvoicesController extends AbstractController
         ]);
     }
 
+    //Histórico de comisiones
     /**
      * @Route("/api/comission", methods={"GET"})
      */
     public function showComissions(InvoicesRepository $invoiceRepository, OrderRepository $orderRepository): Response
     {
-
         $invoices = $invoiceRepository->findAll();
         $response = [];
         foreach ($invoices as $invoice) {
             $response[] = [
-                'order' => $invoice->getOrderRelated(),
                 'id' => $invoice->getId(),
                 'totalPrice' => $invoice->getTotalPrice(),
                 'salesComission' => $invoice->getSalesComission(),
                 'comissionAmount' => $invoice->getComissionAmount()
             ];
         }
-        return new JsonResponse([
-            $response,
-
-        ]);
+        return new JsonResponse($response);
     }
 
     /**
@@ -131,7 +127,6 @@ class InvoicesController extends AbstractController
      */
     public function totalBalance(InvoicesRepository $ir, CustomerRepository $cr, OrderRepository $or): Response
     {
-
         $customers = $cr->findAll();
         $response = [];
         foreach ($customers as $customer) {
@@ -147,11 +142,8 @@ class InvoicesController extends AbstractController
                 ];
             }
         }
-
-
         return new JsonResponse($response);
     }
-
 
     /**
      * @Route("/api/invoice/{id}", methods={"PUT"})

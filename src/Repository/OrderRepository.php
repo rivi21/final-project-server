@@ -20,19 +20,17 @@ class OrderRepository extends ServiceEntityRepository
         parent::__construct($registry, Order::class);
     }
 
-     // LISTADO DE FACTURAS PARA UN CLIENTE
- 
-     /* public function findByCustomer(Customer $customer)
-     {
-         $qb = $this->createQueryBuilder('i')
-             ->select('i, o') 
-             ->join('i.related_order', 'o')
-             ->where('o.customer = :customer')
-             ->orderBy('i.due_date', 'DESC')
-             ->setParameter('customer', $customer)   
-         ;
-         return $qb->getQuery()->execute();
-     } */
+    // LISTADO DE PEDIDOS PARA UN CLIENTE
+
+    public function findOrdersByCustomer(Customer $customer)
+    {
+        $qb = $this->createQueryBuilder('o')
+            ->where('o.customer = :customer')
+            ->orderBy('o.date', 'ASC')
+            ->setParameter('customer', $customer);
+        return $qb->getQuery()->execute();
+    }
+
     
      //LISTADO DE FACTURAS TOtales
     /*  public function findByCustomers($customers)
