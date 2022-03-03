@@ -45,7 +45,7 @@ class CustomerController extends AbstractController
         $content = json_decode($request->getContent(), true);
 
         $customer = new Customer();
-        $agent = $agentRepository->findOneBy(['name' => $content['agent']]);
+        $agent = $agentRepository->findOneBy(['name' => $content['agentName']]);
         $customer->setAgent($agent);
         $customer->setName($content['name']);
         $customer->setAddress($content['address']);
@@ -62,6 +62,22 @@ class CustomerController extends AbstractController
             'content' => $customer
         ]);
     }
+    /**
+     * @Route("/api/customer", methods={"OPTIONS"})
+     */
+    public function options(): Response
+    {
+        return new Response(
+            '',
+            200,
+            [
+                'Access-Control-Allow-Origin' => 'http://localhost:3000',
+                'Access-Control-Allow-Credentials' => 'true',
+                'Access-Control-Allow-Headers' => 'Authorization, Content-Type'
+            ]
+        );
+    }
+
     /**
      * @Route("/api/customer/{id}", methods={"PUT"})
      */

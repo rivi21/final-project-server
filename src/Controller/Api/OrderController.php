@@ -28,13 +28,13 @@ class OrderController extends AbstractController
             $response[] = [
                 'orderNumber' => $order->getId(),
                 'date' => $order->getDate()->format('Y-m-d'),
-                'shippingDate' => $order->getShippingDate()->format('d-m-Y'),
-                'deliveryDate' => $order->getDeliveryDate()->format('d-m-Y'),
+                'shippingDate' => $order->getShippingDate()->format('Y-m-d'),
+                'deliveryDate' => $order->getDeliveryDate()->format('Y-m-d'),
                 $invoice = $order->getInvoice(),
                 "invoiceNumber" => $invoice->getId(),
                 'paymentTerm' => $invoice->getPaymentTerm(),
                 'totalPrice' => $invoice->getTotalPrice(),
-                'dueDate' => $invoice->getDueDate()->format('d-m-Y'),
+                'dueDate' => $invoice->getDueDate()->format('Y-m-d'),
                 'salesComission' => $invoice->getSalesComission(),
                 'comissionAmount' => $invoice->getComissionAmount()
 
@@ -66,8 +66,7 @@ class OrderController extends AbstractController
                     'totalPrice' => $invoice->getTotalPrice(),
                     'dueDate' => $invoice->getDueDate()->format('Y-m-d'),
                     'salesComission' => $invoice->getSalesComission(),
-                    'comissionAmount' => $invoice->getComissionAmount()
-
+                    'comissionAmount' => $invoice->getComissionAmount(),
                 ];
             }
         }
@@ -87,9 +86,9 @@ class OrderController extends AbstractController
         foreach ($orders as $order) {
             $response[] = [
                 'name' => $customer->getName(),
-                'date' => $order->getDate()->format('d-m-Y'),
-                'shippingDate' => $order->getShippingDate()->format('d-m-Y'),
-                'deliveryDate' => $order->getDeliveryDate()->format('d-m-Y'),
+                'date' => $order->getDate()->format('Y-m-d'),
+                'shippingDate' => $order->getShippingDate()->format('Y-m-d'),
+                'deliveryDate' => $order->getDeliveryDate()->format('Y-m-d'),
             ];
         }
         return new JsonResponse([
@@ -110,9 +109,9 @@ class OrderController extends AbstractController
         $order->setCustomer($customer);
         /* $product = $productRepository->findOneBy(['model' => $content['product']]);
         $order->setProduct($product); */
-        $order->setDate(\DateTime::createFromFormat('d-m-Y', $content['date']));
-        $order->setShippingDate(\DateTime::createFromFormat('d-m-Y', $content["shippingDate"]));
-        $order->setDeliveryDate(\DateTime::createFromFormat('d-m-Y', $content["deliveryDate"]));
+        $order->setDate(\DateTime::createFromFormat('Y-m-d', $content['date']));
+        $order->setShippingDate(\DateTime::createFromFormat('Y-m-d', $content["shippingDate"]));
+        $order->setDeliveryDate(\DateTime::createFromFormat('Y-m-d', $content["deliveryDate"]));
 
         $em->persist($order);
         $em->flush();

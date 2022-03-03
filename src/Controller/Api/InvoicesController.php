@@ -30,7 +30,7 @@ class InvoicesController extends AbstractController
             ]
         );
     } */
-
+    //FACTURAS CON TODOS SUS CAMPOS
     /**
      * @Route("/api/invoice", name="api_invoice", methods={"GET"})
      */
@@ -39,32 +39,21 @@ class InvoicesController extends AbstractController
         $invoices = $invoiceRepository->findAll();
         $response = [];
         foreach ($invoices as $invoice) {
+            if (($invoice->getIsPaidDate()) != null){
+                 $isPaidDate = $invoice->getIsPaidDate()->format('Y-m-d');
+            }else{
+                $isPaidDate = " ";
+            }
             $response[] = [
                 'id' => $invoice->getId(),
-                'paymentTerms' => $invoice->getPaymentTerm(),
+                'dueDate' => $invoice->getDueDate()->format('Y-m-d'),
                 'totalPrice' => $invoice->getTotalPrice(),
-                'dueDate' => $invoice->getDueDate()->format('d-m-Y'),
-            ];
-        }
-        return new JsonResponse($response, 200, [
-            'Access-Control-Allow-Origin' => '*'
-        ]);
-    }
-
-    //Histórico de comisiones
-    /**
-     * @Route("/api/comission", methods={"GET"})
-     */
-    public function showComissions(InvoicesRepository $invoiceRepository, OrderRepository $orderRepository): Response
-    {
-        $invoices = $invoiceRepository->findAll();
-        $response = [];
-        foreach ($invoices as $invoice) {
-            $response[] = [
-                'id' => $invoice->getId(),
-                'totalPrice' => $invoice->getTotalPrice(),
+                'paymentTerms' => $invoice->getPaymentTerm(),              
                 'salesComission' => $invoice->getSalesComission(),
-                'comissionAmount' => $invoice->getComissionAmount()
+                'comissionAmount' => $invoice->getComissionAmount(),
+                'isPaid' => $invoice->getIsPaid(),
+                'isPaidDate' => $isPaidDate
+                
             ];
         }
         return new JsonResponse($response);
@@ -82,9 +71,11 @@ class InvoicesController extends AbstractController
         $invoice->setOrderRelated($order);
         $invoice->setPaymentTerm($content['paymentTerm']);
         $invoice->setTotalPrice($content['totalPrice']);
-        $invoice->setDueDate(\DateTime::createFromFormat('d-m-Y', $content['dueDate']));
+        $invoice->setDueDate(\DateTime::createFromFormat('Y-m-d', $content['dueDate']));
         $invoice->setSalesComission($content['salesComission']);
         $invoice->setComissionAmount($content['comissionAmount']);
+        $invoice->setIsPaid($content['isPaid']);
+        $invoice->setIsPaidDate(\DateTime::createFromFormat('Y-m-d', $content['isPaidDaate']));
 
         $em->persist($invoice);
         $em->flush();
@@ -108,9 +99,9 @@ class InvoicesController extends AbstractController
         $response = [];
         foreach ($invoices as $invoice) {
             $response[] = [
-                'id' => $invoice->getId(),
-                'name' => $customer->getName(),
-                'due_date' => $invoice->getDueDate()->format('d-m-Y'),
+                'invoiceId' => $invoice->getId(),
+                'customerName' => $customer->getName(),
+                'dueDate' => $invoice->getDueDate()->format('Y-m-d'),
                 'totalPrice' => $invoice->getTotalPrice(),
                 'salesComission' => $invoice->getSalesComission(),
                 'comissionAmount' => $invoice->getComissionAmount()
@@ -123,7 +114,7 @@ class InvoicesController extends AbstractController
 
     //LISTADO DE FACTURAS POR CLIENTES
     /**
-     * @Route("/totalBalance",  methods={"GET"})
+     * @Route("/invoicesByCustomers",  methods={"GET"})
      */
     public function totalBalance(InvoicesRepository $ir, CustomerRepository $cr, OrderRepository $or): Response
     {
@@ -132,13 +123,24 @@ class InvoicesController extends AbstractController
         foreach ($customers as $customer) {
             $invoices = $ir->findByCustomer($customer);
             foreach ($invoices as $invoice) {
+                $order = $invoice->getOrderRelated();
+                if (($invoice->getIsPaidDate()) != null){
+                    $isPaidDate = $invoice->getIsPaidDate()->format('Y-m-d');
+               }else{
+                   $isPaidDate = "";
+               }
                 $response[] = [
-                    'id' => $invoice->getId(),
-                    'name' => $customer->getName(),
-                    'due_date' => $invoice->getDueDate()->format('d-m-Y'),
+                    
+                    'orderDate' => $order->getDate()->format('Y-m-d'),
+                    'invoiceId' => $invoice->getId(),
+                    'customerId'=> $customer->getId(),
+                    'customerName' => $customer->getName(),
+                    'dueDate' => $invoice->getDueDate()->format('Y-m-d'),
                     'totalPrice' => $invoice->getTotalPrice(),
                     'salesComission' => $invoice->getSalesComission(),
-                    'comissionAmount' => $invoice->getComissionAmount()
+                    'comissionAmount' => $invoice->getComissionAmount(),
+                    'isPaid' => $invoice->getIsPaid(),
+                    'isPaidDate' => $isPaidDate
                 ];
             }
         }
