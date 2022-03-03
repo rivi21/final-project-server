@@ -48,6 +48,16 @@ class Invoices
      */
     private $comissionAmount;
 
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $isPaid;
+
+    /**
+     * @ORM\Column(type="date", nullable=true)
+     */
+    private $isPaidDate;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -121,6 +131,30 @@ class Invoices
     public function setComissionAmount(int $comissionAmount): self
     {
         $this->comissionAmount = $comissionAmount;
+
+        return $this;
+    }
+
+    public function getIsPaid(): ?bool
+    {
+        return $this->isPaid;
+    }
+
+    public function setIsPaid(bool $isPaid): self
+    {
+        $this->isPaid = $isPaid;
+
+        return $this;
+    }
+
+    public function getIsPaidDate(): ?\DateTimeInterface
+    {
+        return $this->isPaidDate;
+    }
+
+    public function setIsPaidDate(?\DateTimeInterface $isPaidDate): self
+    {
+        $this->isPaidDate = $isPaidDate;
 
         return $this;
     }

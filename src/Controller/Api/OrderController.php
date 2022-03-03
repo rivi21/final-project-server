@@ -24,18 +24,18 @@ class OrderController extends AbstractController
     {
         $orders = $orderRepository->findAll();
         $response = [];
-        foreach ($orders as $order) {          
+        foreach ($orders as $order) {
             $response[] = [
-                'orderNumber'=> $order->getId(),
-                'date' => $order->getDate()->format('d-m-Y'),
+                'orderNumber' => $order->getId(),
+                'date' => $order->getDate()->format('Y-m-d'),
                 'shippingDate' => $order->getShippingDate()->format('d-m-Y'),
                 'deliveryDate' => $order->getDeliveryDate()->format('d-m-Y'),
                 $invoice = $order->getInvoice(),
-                "invoiceNumber" => $invoice->getId(),         
-                'paymentTerm'=> $invoice->getPaymentTerm(), 
-                'totalPrice'=> $invoice->getTotalPrice(),
-                'dueDate'=> $invoice->getDueDate()->format('d-m-Y'),
-                'salesComission'=> $invoice->getSalesComission(),
+                "invoiceNumber" => $invoice->getId(),
+                'paymentTerm' => $invoice->getPaymentTerm(),
+                'totalPrice' => $invoice->getTotalPrice(),
+                'dueDate' => $invoice->getDueDate()->format('d-m-Y'),
+                'salesComission' => $invoice->getSalesComission(),
                 'comissionAmount' => $invoice->getComissionAmount()
 
             ];
@@ -52,24 +52,24 @@ class OrderController extends AbstractController
         $response = [];
         foreach ($customers as $customer) {
             $orders = $or->findOrdersByCustomer($customer);
-            foreach ($orders as $order) {          
+            foreach ($orders as $order) {
                 $response[] = [
-                    'orderId'=> $order->getId(),
+                    'orderId' => $order->getId(),
                     'customerId' => $customer->getId(),
-                    'customerName' => $customer->getName(),                   
-                    'date' => $order->getDate()->format('d-m-Y'),
-                    'shippingDate' => $order->getShippingDate()->format('d-m-Y'),
-                    'deliveryDate' => $order->getDeliveryDate()->format('d-m-Y'),
+                    'customerName' => $customer->getName(),
+                    'date' => $order->getDate()->format('Y-m-d'),
+                    'shippingDate' => $order->getShippingDate()->format('Y-m-d'),
+                    'deliveryDate' => $order->getDeliveryDate()->format('Y-m-d'),
                     $invoice = $order->getInvoice(),
-                    "invoiceNumber" => $invoice->getId(),         
-                    'paymentTerm'=> $invoice->getPaymentTerm(), 
-                    'totalPrice'=> $invoice->getTotalPrice(),
-                    'dueDate'=> $invoice->getDueDate()->format('Y-m-d'),
-                    'salesComission'=> $invoice->getSalesComission(),
+                    "invoiceNumber" => $invoice->getId(),
+                    'paymentTerm' => $invoice->getPaymentTerm(),
+                    'totalPrice' => $invoice->getTotalPrice(),
+                    'dueDate' => $invoice->getDueDate()->format('Y-m-d'),
+                    'salesComission' => $invoice->getSalesComission(),
                     'comissionAmount' => $invoice->getComissionAmount()
-    
+
                 ];
-            }          
+            }
         }
         return new JsonResponse($response);
     }
