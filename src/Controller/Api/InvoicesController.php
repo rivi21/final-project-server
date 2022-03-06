@@ -47,7 +47,7 @@ class InvoicesController extends AbstractController
             if (($invoice->getIsPaidDate()) != null) {
                 $isPaidDate = $invoice->getIsPaidDate()->format('Y-m-d');
             } else {
-                $isPaidDate = " ";
+                $isPaidDate = "";
             }
             $response[] = [              
                 'invoiceId' => $invoice->getId(),
@@ -92,7 +92,7 @@ class InvoicesController extends AbstractController
 
     // LISTADO DE FACTURAS DE UN CLIENTE
     /**
-     * @Route("/api/invoices/{idCustomer}",  methods={"GET"})
+     * @Route("/api/invoices/{idCustomer}", methods={"GET"})
      */
     public function dueBalance($idCustomer, InvoicesRepository $ir, CustomerRepository $cr): Response
     {
