@@ -33,29 +33,31 @@ class InvoicesController extends AbstractController
         );
     } */
 
-    //TODAS LAS FACTURAS CON TODOS SUS CAMPOS
+    //CONSULTA PARA LAS COMISIONES
     /**
-     * @Route("/api/invoice", name="api_invoice", methods={"GET"})
+     * @Route("/api/comission", name="api_comission", methods={"GET"})
      */
     public function index(InvoicesRepository $invoiceRepository): Response
     {
         $invoices = $invoiceRepository->findAll();
         $response = [];
         foreach ($invoices as $invoice) {
+            $order = $invoice->getOrderRelated();
+            $customer = $order->getCustomer();
             if (($invoice->getIsPaidDate()) != null) {
                 $isPaidDate = $invoice->getIsPaidDate()->format('Y-m-d');
             } else {
                 $isPaidDate = " ";
             }
-            $response[] = [
-                'id' => $invoice->getId(),
-                'dueDate' => $invoice->getDueDate()->format('Y-m-d'),
+            $response[] = [              
+                'invoiceId' => $invoice->getId(),
+                'customerId' => $customer->getId(),
+                'customerName' => $customer->getName(),
+                'isPaidDate' => $isPaidDate,
                 'totalPrice' => $invoice->getTotalPrice(),
-                'paymentTerms' => $invoice->getPaymentTerm(),
                 'salesComission' => $invoice->getSalesComission(),
                 'comissionAmount' => $invoice->getComissionAmount(),
-                'isPaid' => $invoice->getIsPaid(),
-                'isPaidDate' => $isPaidDate
+                
             ];
         }
         return new JsonResponse($response);
@@ -148,43 +150,26 @@ class InvoicesController extends AbstractController
     public function invoicesAndCustomers(InvoicesRepository $ir, CustomerRepository $cr, ShoppingCartItemRepository $scir): Response
     {
         $invoices = $ir->findAll();
-        /* $customers = $cr->findAll(); */
-        /* $cartItems = $scir->findAll(); */
         $response = [];
-        /*  foreach ($customers as $customer) {
-            $agent = $customer->getAgent();
-            $invoices = $ir->findByCustomer($customer); */
         foreach ($invoices as $invoice) {
             $order = $invoice->getOrderRelated();
             $customer = $order->getCustomer();
-            /*  $cartItem = $cartItems;
-                $product = $cartItem->getProduct();
-                $totalAmount = ($product->getPrice()) * ($item->getQuantity()); */
             $response[] = [
                 'invoiceId' => $invoice->getId(),
-                /* 'agent' => $agent->getName(), */
                 'customerId' => $customer->getId(),
                 'customerName' => $customer->getName(),
+
                 /* 'address' => $customer->getAddress(), */
                 'orderId' => $order->getId(),
                 /* 'orderDate' => $order->getdate()->format('d-m-Y'), */
                 'deliveryDate' => $order->getDeliveryDate()->format('Y-m-d'),
                 'totalPrice' => $invoice->getTotalPrice(),
-                /* 'productId' => $product->getId(),
-                    'type' => $product->getType(),
-                    'model' => $product->getModel(),
-                    'price' => $product->getPrice(),
-                    'stock' => $product->getStock(),
-                    'quantity' => $cartItem->getQuantity(),
-                    'productAmount' => $totalAmount, */
 
             ];
         }
 
         return new JsonResponse($response);
     }
-
-
 
     /**
      * @Route("/api/invoice/{id}", methods={"PUT"})
