@@ -20,7 +20,7 @@ class OrderController extends AbstractController
     /**
      * @Route("/api/sales", methods={"GET"})
      */
-    public function salesData(OrderRepository $or, CustomerRepository $cr): Response
+    public function salesData(OrderRepository $or): Response
     {
         $orders = $or->findAll();
         $response = [];
@@ -33,6 +33,9 @@ class OrderController extends AbstractController
                 'date' => $order->getDate()->format('Y-m-d'),
                 'shippingDate' => $order->getShippingDate()->format('Y-m-d'),
                 'deliveryDate' => $order->getDeliveryDate()->format('Y-m-d'),
+                'isPreparing' => $order->getIsPreparing(),
+                'isPrepared' => $order->getIsPrepared(),
+                'isShipped' => $order->getShippingDate(),
                 $invoice = $order->getInvoice(),
                 "invoiceId" => $invoice->getId(),
                 'paymentTerm' => $invoice->getPaymentTerm(),
@@ -140,7 +143,8 @@ class OrderController extends AbstractController
     /**
      * @Route("api/order" methods={"PUT"})
      */
-    public function updateStatus()
+    /* public function updateStatus()
     {
-    }
+
+    } */
 }
