@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Customer;
 use App\Entity\Invoices;
+use App\Entity\Order;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -42,6 +43,7 @@ class InvoicesRepository extends ServiceEntityRepository
             ->setParameter('customers', $customers);
         return $qb->getQuery()->getSQL();
     }
+   
 
     // /**
     //  * @return Invoices[] Returns an array of Invoices objects

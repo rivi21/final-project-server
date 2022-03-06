@@ -6,6 +6,8 @@ use App\Entity\Invoices;
 use App\Repository\CustomerRepository;
 use App\Repository\InvoicesRepository;
 use App\Repository\OrderRepository;
+use App\Repository\ProductRepository;
+use App\Repository\ShoppingCartItemRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -30,7 +32,8 @@ class InvoicesController extends AbstractController
             ]
         );
     } */
-    //FACTURAS CON TODOS SUS CAMPOS
+
+    //TODAS LAS FACTURAS CON TODOS SUS CAMPOS
     /**
      * @Route("/api/invoice", name="api_invoice", methods={"GET"})
      */
@@ -39,21 +42,20 @@ class InvoicesController extends AbstractController
         $invoices = $invoiceRepository->findAll();
         $response = [];
         foreach ($invoices as $invoice) {
-            if (($invoice->getIsPaidDate()) != null){
-                 $isPaidDate = $invoice->getIsPaidDate()->format('Y-m-d');
-            }else{
+            if (($invoice->getIsPaidDate()) != null) {
+                $isPaidDate = $invoice->getIsPaidDate()->format('Y-m-d');
+            } else {
                 $isPaidDate = " ";
             }
             $response[] = [
                 'id' => $invoice->getId(),
                 'dueDate' => $invoice->getDueDate()->format('Y-m-d'),
                 'totalPrice' => $invoice->getTotalPrice(),
-                'paymentTerms' => $invoice->getPaymentTerm(),              
+                'paymentTerms' => $invoice->getPaymentTerm(),
                 'salesComission' => $invoice->getSalesComission(),
                 'comissionAmount' => $invoice->getComissionAmount(),
                 'isPaid' => $invoice->getIsPaid(),
                 'isPaidDate' => $isPaidDate
-                
             ];
         }
         return new JsonResponse($response);
@@ -86,7 +88,7 @@ class InvoicesController extends AbstractController
         ]);
     }
 
-    // LISTADO DE FACTURAS PARA UN CLIENTE
+    // LISTADO DE FACTURAS DE UN CLIENTE
     /**
      * @Route("/api/invoices/{idCustomer}",  methods={"GET"})
      */
@@ -111,41 +113,78 @@ class InvoicesController extends AbstractController
             'Access-Control-Allow-Origin' => '*'
         ]);
     }
-
-    //LISTADO DE FACTURAS POR CLIENTES
+    //LISTADO DE PRODUCTOS Y CANTIDADES POR FACTURA
     /**
-     * @Route("/invoicesByCustomers",  methods={"GET"})
+     * @Route("/api/products_invoice/{id}",  methods={"GET"})
      */
-    public function totalBalance(InvoicesRepository $ir, CustomerRepository $cr, OrderRepository $or): Response
+    public function invoiceProductsList($id, InvoicesRepository $ir, ProductRepository $pr)
     {
-        $customers = $cr->findAll();
+        $invoice = $ir->find($id);
+
+        $order = $invoice->getOrderRelated();
+        $products = $pr->findByOrder($order);
         $response = [];
-        foreach ($customers as $customer) {
-            $invoices = $ir->findByCustomer($customer);
-            foreach ($invoices as $invoice) {
-                $order = $invoice->getOrderRelated();
-                if (($invoice->getIsPaidDate()) != null){
-                    $isPaidDate = $invoice->getIsPaidDate()->format('Y-m-d');
-               }else{
-                   $isPaidDate = "";
-               }
-                $response[] = [
-                    
-                    'orderDate' => $order->getDate()->format('Y-m-d'),
-                    'invoiceId' => $invoice->getId(),
-                    'customerId'=> $customer->getId(),
-                    'customerName' => $customer->getName(),
-                    'dueDate' => $invoice->getDueDate()->format('Y-m-d'),
-                    'totalPrice' => $invoice->getTotalPrice(),
-                    'salesComission' => $invoice->getSalesComission(),
-                    'comissionAmount' => $invoice->getComissionAmount(),
-                    'isPaid' => $invoice->getIsPaid(),
-                    'isPaidDate' => $isPaidDate
-                ];
-            }
+        foreach ($products as $product) {
+            $item = $product->getShoppingCartItems();
+            /* $totalAmount = ($product->getPrice()) * ($shoppingCartItem->getQuantity()); */
+            $response[] = [
+                'orderId' => $order->getId(),
+                'invoiceId' => $invoice->getId(),
+                'productId' => $product->getId(),
+                'type' => $product->getType(),
+                'model' => $product->getModel(),
+                'price' => $product->getPrice(),
+                /* 'amount' =>  */
+                /* 'quantity' => $shoppingCartItem->getQuantity(),
+                'productAmount' => $totalAmount, */
+            ];
         }
         return new JsonResponse($response);
     }
+    //LISTADO DE FACTURAS POR CLIENTES 
+    /**
+     * @Route("/api/invoices",  methods={"GET"})
+     */
+    public function invoicesAndCustomers(InvoicesRepository $ir, CustomerRepository $cr, ShoppingCartItemRepository $scir): Response
+    {
+        $invoices = $ir->findAll();
+        /* $customers = $cr->findAll(); */
+        /* $cartItems = $scir->findAll(); */
+        $response = [];
+        /*  foreach ($customers as $customer) {
+            $agent = $customer->getAgent();
+            $invoices = $ir->findByCustomer($customer); */
+        foreach ($invoices as $invoice) {
+            $order = $invoice->getOrderRelated();
+            $customer = $order->getCustomer();
+            /*  $cartItem = $cartItems;
+                $product = $cartItem->getProduct();
+                $totalAmount = ($product->getPrice()) * ($item->getQuantity()); */
+            $response[] = [
+                'invoiceId' => $invoice->getId(),
+                /* 'agent' => $agent->getName(), */
+                'customerId' => $customer->getId(),
+                'customerName' => $customer->getName(),
+                /* 'address' => $customer->getAddress(), */
+                'orderId' => $order->getId(),
+                /* 'orderDate' => $order->getdate()->format('d-m-Y'), */
+                'deliveryDate' => $order->getDeliveryDate()->format('Y-m-d'),
+                'totalPrice' => $invoice->getTotalPrice(),
+                /* 'productId' => $product->getId(),
+                    'type' => $product->getType(),
+                    'model' => $product->getModel(),
+                    'price' => $product->getPrice(),
+                    'stock' => $product->getStock(),
+                    'quantity' => $cartItem->getQuantity(),
+                    'productAmount' => $totalAmount, */
+
+            ];
+        }
+
+        return new JsonResponse($response);
+    }
+
+
 
     /**
      * @Route("/api/invoice/{id}", methods={"PUT"})

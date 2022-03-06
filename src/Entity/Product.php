@@ -40,19 +40,19 @@ class Product
     private $stock;
 
     /**
-     * @ORM\OneToMany(targetEntity=ShoppingCartItem::class, mappedBy="product")
-     */
-    private $shoppingCartItems;
-
-    /**
      * @ORM\OneToMany(targetEntity=Order::class, mappedBy="product")
      */
     private $orders;
 
+    /**
+     * @ORM\OneToMany(targetEntity=ShoppingCartItem::class, mappedBy="Product")
+     */
+    private $shoppingCartItems;
+
     public function __construct()
     {
-        $this->shoppingCartItems = new ArrayCollection();
         $this->orders = new ArrayCollection();
+        $this->shoppingCartItems = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -109,36 +109,6 @@ class Product
     }
 
     /**
-     * @return Collection<int, ShoppingCartItem>
-     */
-    public function getShoppingCartItems(): Collection
-    {
-        return $this->shoppingCartItems;
-    }
-
-    public function addShoppingCartItem(ShoppingCartItem $shoppingCartItem): self
-    {
-        if (!$this->shoppingCartItems->contains($shoppingCartItem)) {
-            $this->shoppingCartItems[] = $shoppingCartItem;
-            $shoppingCartItem->setProduct($this);
-        }
-
-        return $this;
-    }
-
-    public function removeShoppingCartItem(ShoppingCartItem $shoppingCartItem): self
-    {
-        if ($this->shoppingCartItems->removeElement($shoppingCartItem)) {
-            // set the owning side to null (unless already changed)
-            if ($shoppingCartItem->getProduct() === $this) {
-                $shoppingCartItem->setProduct(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
      * @return Collection<int, Order>
      */
     public function getOrders(): Collection
@@ -162,6 +132,36 @@ class Product
             // set the owning side to null (unless already changed)
             if ($order->getProduct() === $this) {
                 $order->setProduct(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ShoppingCartItem>
+     */
+    public function getShoppingCartItems(): Collection
+    {
+        return $this->shoppingCartItems;
+    }
+
+    public function addShoppingCartItem(ShoppingCartItem $shoppingCartItem): self
+    {
+        if (!$this->shoppingCartItems->contains($shoppingCartItem)) {
+            $this->shoppingCartItems[] = $shoppingCartItem;
+            $shoppingCartItem->setProduct($this);
+        }
+
+        return $this;
+    }
+
+    public function removeShoppingCartItem(ShoppingCartItem $shoppingCartItem): self
+    {
+        if ($this->shoppingCartItems->removeElement($shoppingCartItem)) {
+            // set the owning side to null (unless already changed)
+            if ($shoppingCartItem->getProduct() === $this) {
+                $shoppingCartItem->setProduct(null);
             }
         }
 

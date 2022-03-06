@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\Order;
 use App\Entity\ShoppingCartItem;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -18,6 +19,15 @@ class ShoppingCartItemRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, ShoppingCartItem::class);
     }
+
+       // LISTADO DE ITEMS POR PEDIDO
+       public function findByOrderItems(Order $order)
+       {
+           $qb = $this->createQueryBuilder('sc')  
+           ->where('sc.orderRelated = :order')
+           ->setParameter('order', $order);
+           return $qb->getQuery()->execute();
+       }
 
     // /**
     //  * @return ShoppingCartItem[] Returns an array of ShoppingCartItem objects

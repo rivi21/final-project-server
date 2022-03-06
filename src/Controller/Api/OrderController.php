@@ -26,12 +26,12 @@ class OrderController extends AbstractController
         $response = [];
         foreach ($orders as $order) {
             $response[] = [
-                'orderNumber' => $order->getId(),
+                'orderId' => $order->getId(),
                 'date' => $order->getDate()->format('Y-m-d'),
                 'shippingDate' => $order->getShippingDate()->format('Y-m-d'),
                 'deliveryDate' => $order->getDeliveryDate()->format('Y-m-d'),
                 $invoice = $order->getInvoice(),
-                "invoiceNumber" => $invoice->getId(),
+                "invoiceId" => $invoice->getId(),
                 'paymentTerm' => $invoice->getPaymentTerm(),
                 'totalPrice' => $invoice->getTotalPrice(),
                 'dueDate' => $invoice->getDueDate()->format('Y-m-d'),
@@ -61,7 +61,7 @@ class OrderController extends AbstractController
                     'shippingDate' => $order->getShippingDate()->format('Y-m-d'),
                     'deliveryDate' => $order->getDeliveryDate()->format('Y-m-d'),
                     $invoice = $order->getInvoice(),
-                    "invoiceNumber" => $invoice->getId(),
+                    "invoiceId" => $invoice->getId(),
                     'paymentTerm' => $invoice->getPaymentTerm(),
                     'totalPrice' => $invoice->getTotalPrice(),
                     'dueDate' => $invoice->getDueDate()->format('Y-m-d'),
@@ -73,30 +73,45 @@ class OrderController extends AbstractController
         return new JsonResponse($response);
     }
 
-    //Lista de pedidos para un cliente
+    //LISTA DE PEDIDOS, PRODUCTOS Y FACTURAS RELACIONADAS PARA 
+    //TODOS LOS CLIENTES DE UN AGENTE
     /**
-     * @Route("/api/customer_orders", name="api_order", methods={"GET"})
+     * @Route("/api/all_agent_orders", methods={"GET"})
      */
-    public function orderByCustomer(OrderRepository $orderRepository, CustomerRepository $customerRepository): Response
+    public function orderByCustomer(OrderRepository $orderRepository): Response
     {
-        $customer = $customerRepository->findOneBy(['name' => 'KINGFISHER Ltd.']);
-        /* $orders = $orderRepository->findBy(['customer'=> $customer]); */
-        $orders = $customer->getOrders();
+        $orders = $orderRepository->findAll();
         $response = [];
         foreach ($orders as $order) {
-            $response[] = [
-                'name' => $customer->getName(),
-                'date' => $order->getDate()->format('Y-m-d'),
-                'shippingDate' => $order->getShippingDate()->format('Y-m-d'),
-                'deliveryDate' => $order->getDeliveryDate()->format('Y-m-d'),
-            ];
+            $customer = $order->getCustomer();
+            $agent = $customer->getAgent();
+            $cartItems = $order->getShoppingCartItems();
+            $invoice = $order->getInvoice();
+            foreach ($cartItems as $cartItem) {
+                $product = $cartItem->getProduct();
+                $totalAmount = ($product->getPrice()) * ($cartItem->getQuantity());
+                $response[] = [
+                    'agent' => $agent->getName(),
+                    'customerId' => $customer->getId(),
+                    'customerName' => $customer->getName(),
+                    'orderId' => $order->getId(),
+                    'orderDate' => $order->getDate()->format('d-m-Y'),
+                    'deliveryDate' => $order->getDeliveryDate()->format('d-m-Y'),
+                    'productId' => $product->getId(),
+                    'type' => $product->getType(),
+                    'model' => $product->getModel(),
+                    'price' => $product->getPrice(),
+                    'quantity' => $cartItem->getQuantity(),
+                    'productAmount' => $totalAmount,
+                    'invoiceId' => $invoice->getId(),
+                    'totalPrice' => $invoice->getTotalPrice()
+                ];
+            }
         }
-        return new JsonResponse([
-            $response
-        ]);
+        return new JsonResponse($response);
     }
 
-    //Nuevo pedido
+    //NUEVO PEDIDO
     /**
      * @Route("/api/order", methods={"POST"})
      */

@@ -23,6 +23,7 @@ class ProductController extends AbstractController
         $response = [];
         foreach($products as $product) {
             $response[] = [
+                'ìd' => $product->getId(),
                 'type'=> $product->getType(),
                 'model'=> $product->getModel(),
                 'price' => $product->getPrice(),
