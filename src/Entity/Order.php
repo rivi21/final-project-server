@@ -51,6 +51,16 @@ class Order
      */
     private $shoppingCartItems;
 
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $isPreparing;
+
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $isPrepared;
+
     public function __construct()
     {
         $this->shoppingCartItems = new ArrayCollection();
@@ -152,6 +162,30 @@ class Order
                 $shoppingCartItem->setOrderRelated(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getIsPreparing(): ?bool
+    {
+        return $this->isPreparing;
+    }
+
+    public function setIsPreparing(bool $isPreparing): self
+    {
+        $this->isPreparing = $isPreparing;
+
+        return $this;
+    }
+
+    public function getIsPrepared(): ?bool
+    {
+        return $this->isPrepared;
+    }
+
+    public function setIsPrepared(bool $isPrepared): self
+    {
+        $this->isPrepared = $isPrepared;
 
         return $this;
     }

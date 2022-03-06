@@ -30,9 +30,9 @@ class OrderRepository extends ServiceEntityRepository
             ->setParameter('customer', $customer);
         return $qb->getQuery()->execute();
     }
+   
+    //LISTADO DE TODAS LAS FACTURAS 
 
-    
-     //LISTADO DE FACTURAS TOtales
     /*  public function findByCustomers($customers)
      {
          $qb = $this->createQueryBuilder('i')
@@ -45,6 +45,7 @@ class OrderRepository extends ServiceEntityRepository
      } */
 
     // LISTADO DE Pedidos PARA UNA LISTA DE CLIENTES
+    
    /*  public function findByCustomers2($customers)
     {
         $qb = $this->createQueryBuilder('o')
@@ -53,12 +54,6 @@ class OrderRepository extends ServiceEntityRepository
         return $qb->getQuery()->getSQL();
     } */
 
-    /* public function orderBycustomer($customer)
-    {
-        $qb = $this->createQueryBuilder('o')
-            ->where('o.')
-        ;
-    } */
 
     // /**
     //  * @return Order[] Returns an array of Order objects
