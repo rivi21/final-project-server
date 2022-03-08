@@ -61,6 +61,11 @@ class Order
      */
     private $isPrepared;
 
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $isDelivered;
+
     public function __construct()
     {
         $this->shoppingCartItems = new ArrayCollection();
@@ -186,6 +191,18 @@ class Order
     public function setIsPrepared(bool $isPrepared): self
     {
         $this->isPrepared = $isPrepared;
+
+        return $this;
+    }
+
+    public function getIsDelivered(): ?bool
+    {
+        return $this->isDelivered;
+    }
+
+    public function setIsDelivered(bool $isDelivered): self
+    {
+        $this->isDelivered = $isDelivered;
 
         return $this;
     }

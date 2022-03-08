@@ -35,12 +35,14 @@ class OrderController extends AbstractController
                 'deliveryDate' => $order->getDeliveryDate()->format('Y-m-d'),
                 'isPreparing' => $order->getIsPreparing(),
                 'isPrepared' => $order->getIsPrepared(),
-                'isShipped' => $order->getShippingDate(),
+                'isShipped' => $order->getShippingDate()->format('Y-m-d'),
+                'isDelivered' => $order->getIsDelivered(),
                 $invoice = $order->getInvoice(),
                 "invoiceId" => $invoice->getId(),
                 'paymentTerm' => $invoice->getPaymentTerm(),
                 'totalPrice' => $invoice->getTotalPrice(),
                 'dueDate' => $invoice->getDueDate()->format('Y-m-d'),
+                'isPaid' => $invoice->getIsPaid(),
                 'salesComission' => $invoice->getSalesComission(),
                 'comissionAmount' => $invoice->getComissionAmount()
             ];
