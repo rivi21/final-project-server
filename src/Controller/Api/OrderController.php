@@ -26,7 +26,9 @@ class OrderController extends AbstractController
         $response = [];
         foreach ($orders as $order) {
             $customer = $order->getCustomer();
+            $agent = $customer->getAgent();
             $response[] = [
+                'agentEmail' => $agent->getEmail(),
                 'orderId' => $order->getId(),
                 'customerId' => $customer->getId(),
                 'customerName' => $customer->getName(),

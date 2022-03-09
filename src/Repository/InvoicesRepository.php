@@ -20,9 +20,9 @@ class InvoicesRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Invoices::class);
     }
-    // LISTADO DE FACTURAS PARA UN CLIENTE
 
-    public function findByCustomer(Customer $customer)
+    // LISTADO DE FACTURAS PARA UN CLIENTE
+    public function findInvoiceByCustomer(Customer $customer)
     {
         $qb = $this->createQueryBuilder('i')
             ->select('i, o')

@@ -44,12 +44,16 @@ class InvoicesController extends AbstractController
         foreach ($invoices as $invoice) {
             $order = $invoice->getOrderRelated();
             $customer = $order->getCustomer();
+            $agent = $customer->getAgent();
             if (($invoice->getIsPaidDate()) != null) {
                 $isPaidDate = $invoice->getIsPaidDate()->format('Y-m-d');
             } else {
                 $isPaidDate = "";
             }
-            $response[] = [              
+            $response[] = [
+                'agentEmail' => $agent->getEmail(),
+                'agentName'=> $agent->getName(),
+                'agentLastName' => $agent->getLastName(),
                 'invoiceId' => $invoice->getId(),
                 'customerId' => $customer->getId(),
                 'customerName' => $customer->getName(),
@@ -57,7 +61,7 @@ class InvoicesController extends AbstractController
                 'totalPrice' => $invoice->getTotalPrice(),
                 'salesComission' => $invoice->getSalesComission(),
                 'comissionAmount' => $invoice->getComissionAmount(),
-                
+
             ];
         }
         return new JsonResponse($response);
@@ -115,6 +119,30 @@ class InvoicesController extends AbstractController
             'Access-Control-Allow-Origin' => '*'
         ]);
     }
+    //SUMATORIO DE FACTURAS POR CLIENTE
+    /**
+     * @Route("/api/amount", methods={"GET"})
+     */
+    public function invoicesSum(CustomerRepository $customerRepository, InvoicesRepository $invoicesRepository)
+    {
+        $customers = $customerRepository->findAll();
+        $response = [];
+        foreach ($customers as $customer) {
+            $agent = $customer->getAgent();
+            $invoices = $invoicesRepository->findInvoiceByCustomer($customer);
+            $sum = 0;
+            foreach ($invoices as $invoice) {
+                $sum += $invoice->getTotalPrice();
+            }
+            $response[] = [
+                'agentEmail' => $agent->getEmail(),
+                'customerId' => $customer->getId(),
+                'customerName' => $customer->getName(),
+                'totalAmount' => $sum,
+            ];
+        }
+        return new JsonResponse ($response, 200);
+    }
     //LISTADO DE PRODUCTOS Y CANTIDADES POR FACTURA
     /**
      * @Route("/api/products_invoice/{id}",  methods={"GET"})
@@ -154,7 +182,9 @@ class InvoicesController extends AbstractController
         foreach ($invoices as $invoice) {
             $order = $invoice->getOrderRelated();
             $customer = $order->getCustomer();
+            $agent = $customer->getAgent();
             $response[] = [
+                'agentEmail' => $agent->getEmail(),
                 'invoiceId' => $invoice->getId(),
                 'customerId' => $customer->getId(),
                 'customerName' => $customer->getName(),
