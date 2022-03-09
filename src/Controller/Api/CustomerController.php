@@ -15,7 +15,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class CustomerController extends AbstractController
 {
     /**
-     * @Route("/api/customer", name="api_customer", methods={"GET"})
+     * @Route("/api/customers", name="api_customer", methods={"GET"})
      */
     public function index(CustomerRepository $customerRepository): Response
     {
@@ -36,8 +36,24 @@ class CustomerController extends AbstractController
             'Access-Control-Allow-Origin' => '*'
         ]);
     }
+    //RRUTA PARA OBTENER UN CUSTOMER POR SU ID
+    /**
+     * @Route("/api/customer/{id}", methods={"GET"})
+     */
+    public function oneCustomer($id, CustomerRepository $customerRepository): Response
+    {
+        $customer = $customerRepository->findOneBy(['id' =>$id]);
 
-
+        return new JsonResponse([
+            'id' => $customer->getId(),
+            'name' => $customer->getName(),
+            'address' => $customer->getAddress(),
+            'country' => $customer->getCountry(),
+            'phoneNumber' => $customer->getPhoneNumber(),
+            'email' => $customer->getEmail(),
+            'web' => $customer->getWeb()
+        ]);
+    }
     /**
      * @Route("/api/customer", methods={"POST"})
      */
