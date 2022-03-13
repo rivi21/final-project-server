@@ -37,8 +37,8 @@ class ShoppingCartItemController extends AbstractController
                 'customerName' => $customer->getName(),
                 'customerAddress' => $customer->getAddress(),
                 'orderId' => $order->getId(),
-                'orderDate' => $order->getDate()->format('d-m-Y'),
-                'deliveryDate' => $order->getDeliveryDate()->format('d-m-Y'),
+                'orderDate' => $order->getDate(),
+                'deliveryDate' => $order->getDeliveryDate(),
                 'invoiceId' => $invoice->getId(),
                 'totalPrice' => $invoice->getTotalPrice(),
                 'productId' => $product->getId(),
@@ -54,26 +54,54 @@ class ShoppingCartItemController extends AbstractController
 
     // NUEVO ITEM EN EL CARRITO
     /**
-     * @Route("/api/order_items", methods={"POST"})
+     * @Route("/api/order_item", methods={"POST"})
      */
     public function add(
         Request $request,
         EntityManagerInterface $em,
-        OrderRepository $orderRepository,
+        /* OrderRepository $orderRepository, */
         ProductRepository $productRepository
     ) {
         $content = json_decode($request->getContent(), true);
 
         $item = new ShoppingCartItem();
-        $order = $orderRepository->findOneBy(['id' => $content['orderId']]);
+        /* $order = $orderRepository->findOneBy(['id' => $content['orderId']]); */
         $product = $productRepository->findOneBy(['id' => $content['productId']]);
-        $item->setOrderRelated($order);
+        /* $item->setOrderRelated($order); */
         $item->setProduct($product);
         $item->setQuantity($content['quantity']);
 
         $em->persist($item);
         $em->flush();
 
+        return new JsonResponse([
+            'result' => 'add con POST ok',
+            'content' => $content
+        ]);
+    }
+    //TODOS LOS ITEMS DE UN PEDIDO 
+    /**
+     * @Route("/api/order_items", methods={"POST"})
+     */
+    public function addAll(
+        Request $request,
+        EntityManagerInterface $em,
+        OrderRepository $orderRepository,
+        ProductRepository $productRepository
+    ) {
+        $content = json_decode($request->getContent(), true);
+        $products = $content->findBy('items');
+
+        foreach ($products as $product) {
+            $item = new ShoppingCartItem();
+            $productId = $productRepository->findOneBy(['id' => $product['id']]);
+            $item->setProduct($productId);
+            $item->setQuantity($product['quantity']);
+
+            $em->persist($item);
+        }
+            /* $item->setOrderRelated($order); */;
+        $em->flush();
         return new JsonResponse([
             'result' => 'add con POST ok',
             'content' => $content

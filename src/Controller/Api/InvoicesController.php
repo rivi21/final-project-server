@@ -17,10 +17,10 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class InvoicesController extends AbstractController
 {
-    /**
-     * @Route("/api/invoice", name="api_invoice", methods={"OPTIONS"})
+    /*
+     * @Route("/api/comission", name="api_comission",  methods={"OPTIONS"})
      */
-    /* public function options(): Response
+    public function options(): Response
     {
         return new Response(
             '',
@@ -31,7 +31,7 @@ class InvoicesController extends AbstractController
                 'Access-Control-Allow-Headers' => 'Authorization, Content-Type'
             ]
         );
-    } */
+    }
 
     //CONSULTA PARA LAS COMISIONES
     /**
@@ -52,7 +52,7 @@ class InvoicesController extends AbstractController
             }
             $response[] = [
                 'agentEmail' => $agent->getEmail(),
-                'agentName'=> $agent->getName(),
+                'agentName' => $agent->getName(),
                 'agentLastName' => $agent->getLastName(),
                 'invoiceId' => $invoice->getId(),
                 'customerId' => $customer->getId(),
@@ -141,7 +141,7 @@ class InvoicesController extends AbstractController
                 'totalAmount' => $sum,
             ];
         }
-        return new JsonResponse ($response, 200);
+        return new JsonResponse($response, 200);
     }
     //LISTADO DE PRODUCTOS Y CANTIDADES POR FACTURA
     /**

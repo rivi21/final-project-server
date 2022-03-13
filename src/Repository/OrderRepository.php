@@ -19,6 +19,14 @@ class OrderRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Order::class);
     }
+    //Último pedido
+    public function findByLastId()
+    {
+        $qb = $this->createQueryBuilder('0')
+            ->orderBy('o.id', 'DESC')
+            ->setMaxResults(1);
+        return $qb->getQuery()->execute();
+    }
 
     // LISTADO DE PEDIDOS PARA UN CLIENTE
 
@@ -30,7 +38,7 @@ class OrderRepository extends ServiceEntityRepository
             ->setParameter('customer', $customer);
         return $qb->getQuery()->execute();
     }
-   
+
     //LISTADO DE TODAS LAS FACTURAS 
 
     /*  public function findByCustomers($customers)
@@ -45,8 +53,8 @@ class OrderRepository extends ServiceEntityRepository
      } */
 
     // LISTADO DE Pedidos PARA UNA LISTA DE CLIENTES
-    
-   /*  public function findByCustomers2($customers)
+
+    /*  public function findByCustomers2($customers)
     {
         $qb = $this->createQueryBuilder('o')
             ->where('o.customer in (:customers)')

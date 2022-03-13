@@ -3,6 +3,7 @@
 namespace App\Controller\Api;
 
 use App\Entity\Order;
+use App\Entity\ShoppingCartItem;
 use App\Repository\CustomerRepository;
 use App\Repository\InvoicesRepository;
 use App\Repository\OrderRepository;
@@ -16,6 +17,20 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class OrderController extends AbstractController
 {
+    //ÚLTIMO PEDIDO
+    /**
+     * @Route("/api/order", methods={"GET"})
+     */
+    public function allOrdersID(OrderRepository $orderRepository)
+    {
+        $orders = $orderRepository->findBy([], ['id' => 'DESC'], 1);
+        foreach ($orders as $order) {
+            $id = $order->getId();
+        }
+        return new JsonResponse($id);
+    }
+
+
     //CONSULTA PARA LAS VENTAS
     /**
      * @Route("/api/sales", methods={"GET"})
@@ -32,12 +47,12 @@ class OrderController extends AbstractController
                 'orderId' => $order->getId(),
                 'customerId' => $customer->getId(),
                 'customerName' => $customer->getName(),
-                'date' => $order->getDate()->format('Y-m-d'),
-                'shippingDate' => $order->getShippingDate()->format('Y-m-d'),
-                'deliveryDate' => $order->getDeliveryDate()->format('Y-m-d'),
+                'date' => $order->getDate(),
+                'shippingDate' => $order->getShippingDate(),
+                'deliveryDate' => $order->getDeliveryDate(),
                 'isPreparing' => $order->getIsPreparing(),
                 'isPrepared' => $order->getIsPrepared(),
-                'isShipped' => $order->getShippingDate()->format('Y-m-d'),
+                'isShipped' => $order->getShippingDate(),
                 'isDelivered' => $order->getIsDelivered(),
                 $invoice = $order->getInvoice(),
                 "invoiceId" => $invoice->getId(),
@@ -63,9 +78,9 @@ class OrderController extends AbstractController
         foreach ($orders as $order) {
             $response[] = [
                 'orderId' => $order->getId(),
-                'date' => $order->getDate()->format('Y-m-d'),
-                'shippingDate' => $order->getShippingDate()->format('Y-m-d'),
-                'deliveryDate' => $order->getDeliveryDate()->format('Y-m-d'),
+                'date' => $order->getDate(),
+                'shippingDate' => $order->getShippingDate(),
+                'deliveryDate' => $order->getDeliveryDate(),
                 $invoice = $order->getInvoice(),
                 "invoiceId" => $invoice->getId(),
                 'paymentTerm' => $invoice->getPaymentTerm(),
@@ -101,8 +116,8 @@ class OrderController extends AbstractController
                     'customerId' => $customer->getId(),
                     'customerName' => $customer->getName(),
                     'orderId' => $order->getId(),
-                    'orderDate' => $order->getDate()->format('d-m-Y'),
-                    'deliveryDate' => $order->getDeliveryDate()->format('d-m-Y'),
+                    'orderDate' => $order->getDate(),
+                    'deliveryDate' => $order->getDeliveryDate(),
                     'productId' => $product->getId(),
                     'type' => $product->getType(),
                     'model' => $product->getModel(),
@@ -121,20 +136,27 @@ class OrderController extends AbstractController
     /**
      * @Route("/api/order", methods={"POST"})
      */
-    public function add(Request $request, EntityManagerInterface $em, CustomerRepository $customerRepository, ProductRepository $productRepository)
-    {
+    public function add(
+        Request $request,
+        EntityManagerInterface $em,
+        CustomerRepository $customerRepository,
+        ProductRepository $productRepository
+    ) {
         $content = json_decode($request->getContent(), true);
 
         $order = new Order();
         $customer = $customerRepository->findOneBy(['id' => $content['customer']]);
         $order->setCustomer($customer);
-        /* $product = $productRepository->findOneBy(['model' => $content['product']]);
-        $order->setProduct($product); */
-        $order->setDate(\DateTime::createFromFormat('Y-m-d', $content['date']));
-        $order->setShippingDate(\DateTime::createFromFormat('Y-m-d', $content["shippingDate"]));
-        $order->setDeliveryDate(\DateTime::createFromFormat('Y-m-d', $content["deliveryDate"]));
+        $order->setDate($content['date']);
+
+        /* $product= $order->addShoppingCartItem(); */
+        /*  $product = $productRepository->findOneBy(['model' => $content['product']]); */
+        /* $order->setProduct($product); */
+        /* $order->setShippingDate(\DateTime::createFromFormat('Y-m-d', $content["shippingDate"]));
+        $order->setDeliveryDate(\DateTime::createFromFormat('Y-m-d', $content["deliveryDate"])); */
 
         $em->persist($order);
+
         $em->flush();
 
         return new JsonResponse([

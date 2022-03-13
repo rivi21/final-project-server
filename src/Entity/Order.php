@@ -21,17 +21,17 @@ class Order
     private $id;
 
     /**
-     * @ORM\Column(type="date")
+     * @ORM\Column(type="string", length=255)
      */
     private $date;
 
     /**
-     * @ORM\Column(type="date")
+     * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $shippingDate;
 
     /**
-     * @ORM\Column(type="date")
+     * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $deliveryDate;
 
@@ -39,7 +39,7 @@ class Order
      * @ORM\ManyToOne(targetEntity=Customer::class, inversedBy="orders")
      * @ORM\JoinColumn(nullable=false)
      */
-    private $customer;  
+    private $customer;
 
     /**
      * @ORM\OneToOne(targetEntity=Invoices::class, mappedBy="orderRelated", cascade={"persist", "remove"})
@@ -52,17 +52,17 @@ class Order
     private $shoppingCartItems;
 
     /**
-     * @ORM\Column(type="boolean")
+     * @ORM\Column(type="boolean",  nullable=true)
      */
     private $isPreparing;
 
     /**
-     * @ORM\Column(type="boolean")
+     * @ORM\Column(type="boolean",  nullable=true)
      */
     private $isPrepared;
 
     /**
-     * @ORM\Column(type="boolean")
+     * @ORM\Column(type="boolean",  nullable=true)
      */
     private $isDelivered;
 
@@ -76,36 +76,36 @@ class Order
         return $this->id;
     }
 
-    public function getDate(): ?\DateTimeInterface
+    public function getDate(): ?string
     {
         return $this->date;
     }
 
-    public function setDate(\DateTimeInterface $date): self
+    public function setDate(string $date): self
     {
         $this->date = $date;
 
         return $this;
     }
 
-    public function getShippingDate(): ?\DateTimeInterface
+    public function getShippingDate(): ?string
     {
         return $this->shippingDate;
     }
 
-    public function setShippingDate(\DateTimeInterface $shippingDate): self
+    public function setShippingDate(string $shippingDate): self
     {
         $this->shippingDate = $shippingDate;
 
         return $this;
     }
 
-    public function getDeliveryDate(): ?\DateTimeInterface
+    public function getDeliveryDate(): ?string
     {
         return $this->deliveryDate;
     }
 
-    public function setDeliveryDate(\DateTimeInterface $deliveryDate): self
+    public function setDeliveryDate(string $deliveryDate): self
     {
         $this->deliveryDate = $deliveryDate;
 
