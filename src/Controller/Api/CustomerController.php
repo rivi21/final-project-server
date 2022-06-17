@@ -22,7 +22,9 @@ class CustomerController extends AbstractController
         $customers = $customerRepository->findAll();
         $response = [];
         foreach ($customers as $customer) {
+            $agent = $customer->getAgent();
             $response[] = [
+                'agentEmail' => $agent->getEmail(),
                 'id' => $customer->getId(),
                 'name' => $customer->getName(),
                 'address' => $customer->getAddress(),
@@ -36,7 +38,7 @@ class CustomerController extends AbstractController
             'Access-Control-Allow-Origin' => '*'
         ]);
     }
-    //RRUTA PARA OBTENER UN CUSTOMER POR SU ID
+    //RUTA PARA OBTENER UN CUSTOMER POR SU ID
     /**
      * @Route("/api/customer/{id}", methods={"GET"})
      */
@@ -54,6 +56,7 @@ class CustomerController extends AbstractController
             'web' => $customer->getWeb()
         ]);
     }
+    //NUECO CLIENTE
     /**
      * @Route("/api/customer", methods={"POST"})
      */

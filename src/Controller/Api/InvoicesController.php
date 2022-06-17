@@ -192,7 +192,7 @@ class InvoicesController extends AbstractController
                 /* 'address' => $customer->getAddress(), */
                 'orderId' => $order->getId(),
                 /* 'orderDate' => $order->getdate()->format('d-m-Y'), */
-                'deliveryDate' => $order->getDeliveryDate()->format('Y-m-d'),
+                'deliveryDate' => $order->getDeliveryDate(),
                 'totalPrice' => $invoice->getTotalPrice(),
 
             ];

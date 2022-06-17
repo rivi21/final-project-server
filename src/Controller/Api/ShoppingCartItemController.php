@@ -89,22 +89,25 @@ class ShoppingCartItemController extends AbstractController
         OrderRepository $orderRepository,
         ProductRepository $productRepository
     ) {
-        $content = json_decode($request->getContent(), true);
-        $products = $content->findBy('items');
-
-        foreach ($products as $product) {
+        $products = json_decode($request->getContent(), true);
+        /* $data = [];
+        foreach ($products as $product) { */
+            $order = $orderRepository->findOneBy(['id' => $products['orderId']]);  
+            $productId = $productRepository->findOneBy(['id' => $products['id']]);
             $item = new ShoppingCartItem();
-            $productId = $productRepository->findOneBy(['id' => $product['id']]);
+            $item->setOrderRelated($order);
             $item->setProduct($productId);
-            $item->setQuantity($product['quantity']);
-
+            $item->setQuantity($products['quantity']);
+           
             $em->persist($item);
-        }
-            /* $item->setOrderRelated($order); */;
+       /*  } */
+        
         $em->flush();
+           
+
         return new JsonResponse([
             'result' => 'add con POST ok',
-            'content' => $content
+            /* 'content' => $data */
         ]);
     }
 }

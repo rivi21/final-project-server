@@ -29,7 +29,36 @@ class OrderController extends AbstractController
         }
         return new JsonResponse($id);
     }
-
+    //CONSULTA PARA LAS OFERTAS
+    /**
+     * @Route("/api/offers", methods={"GET"})
+     */
+    public function offers(OrderRepository $or): Response
+    {
+        $orders = $or->findAll();
+        $response = [];
+        foreach ($orders as $order) {
+            $customer = $order->getCustomer();
+            $agent = $customer->getAgent();
+            $cartItems = $order->getShoppingCartItems();
+            $sum = 0;
+            foreach ($cartItems as $cartItem) {
+                $product = $cartItem->getProduct();
+                $price = $product->getPrice() * $cartItem->getQuantity();
+                $sum = $sum + $price;
+            }
+            $response[] = [
+                'agentEmail' => $agent->getEmail(),
+                'orderId' => $order->getId(),
+                'customerId' => $customer->getId(),
+                'customerName' => $customer->getName(),
+                'date' => $order->getDate(),
+                'shippingDate' => $order->getShippingDate(),
+                'totalPrice' => $sum
+            ];
+        }
+        return new JsonResponse($response);
+    }
 
     //CONSULTA PARA LAS VENTAS
     /**
@@ -42,27 +71,52 @@ class OrderController extends AbstractController
         foreach ($orders as $order) {
             $customer = $order->getCustomer();
             $agent = $customer->getAgent();
-            $response[] = [
-                'agentEmail' => $agent->getEmail(),
-                'orderId' => $order->getId(),
-                'customerId' => $customer->getId(),
-                'customerName' => $customer->getName(),
-                'date' => $order->getDate(),
-                'shippingDate' => $order->getShippingDate(),
-                'deliveryDate' => $order->getDeliveryDate(),
-                'isPreparing' => $order->getIsPreparing(),
-                'isPrepared' => $order->getIsPrepared(),
-                'isShipped' => $order->getShippingDate(),
-                'isDelivered' => $order->getIsDelivered(),
-                $invoice = $order->getInvoice(),
-                "invoiceId" => $invoice->getId(),
-                'paymentTerm' => $invoice->getPaymentTerm(),
-                'totalPrice' => $invoice->getTotalPrice(),
-                'dueDate' => $invoice->getDueDate()->format('Y-m-d'),
-                'isPaid' => $invoice->getIsPaid(),
-                'salesComission' => $invoice->getSalesComission(),
-                'comissionAmount' => $invoice->getComissionAmount()
-            ];
+            $invoice = $order->getInvoice();
+            $cartItems = $order->getShoppingCartItems();
+            $sum = 0;
+            foreach ($cartItems as $cartItem) {
+                $product = $cartItem->getProduct();
+                $price = $product->getPrice() * $cartItem->getQuantity();
+                $sum = $sum + $price;
+            }
+            if ($invoice != null) {
+                $response[] = [
+                    'agentEmail' => $agent->getEmail(),
+                    'orderId' => $order->getId(),
+                    'customerId' => $customer->getId(),
+                    'customerName' => $customer->getName(),
+                    'date' => $order->getDate(),
+                    'shippingDate' => $order->getShippingDate(),
+                    'deliveryDate' => $order->getDeliveryDate(),
+                    'isPreparing' => $order->getIsPreparing(),
+                    'isPrepared' => $order->getIsPrepared(),
+                    'isShipped' => $order->getShippingDate(),
+                    'isDelivered' => $order->getIsDelivered(),
+                    'invoiceId' => $invoice->getId(),
+                    'paymentTerm' => $invoice->getPaymentTerm(),
+                    'totalPrice' => $invoice->getTotalPrice(),
+                    'dueDate' => $invoice->getDueDate()->format('Y-m-d'),
+                    'isPaid' => $invoice->getIsPaid(),
+                    'salesComission' => $invoice->getSalesComission(),
+                    'comissionAmount' => $invoice->getComissionAmount()
+                ];
+            } else {
+                
+                $response[] = [
+                    'agentEmail' => $agent->getEmail(),
+                    'orderId' => $order->getId(),
+                    'customerId' => $customer->getId(),
+                    'customerName' => $customer->getName(),
+                    'date' => $order->getDate(),
+                    'shippingDate' => $order->getShippingDate(),
+                    'deliveryDate' => $order->getDeliveryDate(),
+                    'isPreparing' => $order->getIsPreparing(),
+                    'isPrepared' => $order->getIsPrepared(),
+                    'isShipped' => $order->getShippingDate(),
+                    'isDelivered' => $order->getIsDelivered(),
+                    'totalPrice' => $sum
+                ];
+            }
         }
         return new JsonResponse($response);
     }
@@ -82,7 +136,7 @@ class OrderController extends AbstractController
                 'shippingDate' => $order->getShippingDate(),
                 'deliveryDate' => $order->getDeliveryDate(),
                 $invoice = $order->getInvoice(),
-                "invoiceId" => $invoice->getId(),
+                'invoiceId' => $invoice->getId(),
                 'paymentTerm' => $invoice->getPaymentTerm(),
                 'totalPrice' => $invoice->getTotalPrice(),
                 'dueDate' => $invoice->getDueDate()->format('Y-m-d'),
@@ -139,8 +193,7 @@ class OrderController extends AbstractController
     public function add(
         Request $request,
         EntityManagerInterface $em,
-        CustomerRepository $customerRepository,
-        ProductRepository $productRepository
+        CustomerRepository $customerRepository
     ) {
         $content = json_decode($request->getContent(), true);
 
@@ -148,12 +201,6 @@ class OrderController extends AbstractController
         $customer = $customerRepository->findOneBy(['id' => $content['customer']]);
         $order->setCustomer($customer);
         $order->setDate($content['date']);
-
-        /* $product= $order->addShoppingCartItem(); */
-        /*  $product = $productRepository->findOneBy(['model' => $content['product']]); */
-        /* $order->setProduct($product); */
-        /* $order->setShippingDate(\DateTime::createFromFormat('Y-m-d', $content["shippingDate"]));
-        $order->setDeliveryDate(\DateTime::createFromFormat('Y-m-d', $content["deliveryDate"])); */
 
         $em->persist($order);
 
@@ -165,12 +212,24 @@ class OrderController extends AbstractController
         ]);
     }
 
-    //MODIFICAR ESTADO DE PREPARACIÓN
-    /**
-     * @Route("api/order" methods={"PUT"})
+     /**
+     * @Route("/api/order/{id}", methods={"PUT"})
      */
-    /* public function updateStatus()
+    public function update($id, Request $request, OrderRepository $orderRepository, EntityManagerInterface $em)
     {
+        $content = json_decode($request->getContent(), true);
+        $order = $orderRepository->find($id);
 
-    } */
+        $order->setShippingDate(\DateTime::createFromFormat('Y-m-d', $content["shippingDate"]));
+        
+        $em->flush();
+
+        return new JsonResponse([
+            'result' => 'update con PUT ok',
+            'content' => $order
+        ]);
+    }
+    /* $product= $order->addShoppingCartItem(); */
+        /*  $product = $productRepository->findOneBy(['model' => $content['product']]); */
+        /* $order->setProduct($product); */
 }

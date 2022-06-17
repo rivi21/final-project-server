@@ -66,6 +66,11 @@ class Order
      */
     private $isDelivered;
 
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     */
+    private $isPending;
+
     public function __construct()
     {
         $this->shoppingCartItems = new ArrayCollection();
@@ -203,6 +208,18 @@ class Order
     public function setIsDelivered(bool $isDelivered): self
     {
         $this->isDelivered = $isDelivered;
+
+        return $this;
+    }
+
+    public function getIsPending(): ?bool
+    {
+        return $this->isPending;
+    }
+
+    public function setIsPending(bool $isPending): self
+    {
+        $this->isPending = $isPending;
 
         return $this;
     }
